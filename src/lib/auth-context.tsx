@@ -9,7 +9,9 @@ type AuthValue = {
   session: Session | null;
   user: User | null;
   profile: ProfileRow | null;
+  roles: string[];
   isAdmin: boolean;
+  isFinance: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
 };
@@ -19,7 +21,7 @@ const AuthContext = createContext<AuthValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<ProfileRow | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [roles, setRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const queryClient = useQueryClient();
 
@@ -42,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userId = session?.user?.id;
     if (!userId) {
       setProfile(null);
-      setIsAdmin(false);
+      setRoles([]);
       return;
     }
     let active = true;
@@ -53,9 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ]);
       if (!active) return;
       setProfile(profileRow ?? null);
-      setIsAdmin(
-        (roles ?? []).some((row) => row.role === "admin" || row.role === "super_admin"),
-      );
+      setRoles((roles ?? []).map((row) => String(row.role)));
     })();
     return () => {
       active = false;
