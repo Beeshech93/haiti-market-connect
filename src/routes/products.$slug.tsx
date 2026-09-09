@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ExternalLink, Heart, Minus, Package, Plus, ShieldCheck, Star, Truck } from "lucide-react";
+import { Heart, Minus, Package, Plus, ShieldCheck, Star, Truck } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -334,4 +334,3 @@ function ProductDetailPage() {
   );
 }
 
-export { ExternalLink };
