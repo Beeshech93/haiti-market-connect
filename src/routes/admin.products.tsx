@@ -51,6 +51,45 @@ function AdminProducts() {
   const categories = useQuery(categoriesQuery());
   const [form, setForm] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
+  const [translating, setTranslating] = useState<"name" | "description" | null>(null);
+  const runTranslate = useServerFn(translateText);
+
+  async function handleTranslate(field: "name" | "description") {
+    const frValue = field === "name" ? form.name_fr : form.description_fr;
+    const htValue = field === "name" ? form.name_ht : form.description_ht;
+
+    let from: "fr" | "ht";
+    let text: string;
+    if (frValue.trim() && !htValue.trim()) {
+      from = "fr";
+      text = frValue.trim();
+    } else if (htValue.trim() && !frValue.trim()) {
+      from = "ht";
+      text = htValue.trim();
+    } else if (frValue.trim() && htValue.trim()) {
+      if (!window.confirm(t("admin.translateOverwrite"))) return;
+      from = "fr";
+      text = frValue.trim();
+    } else {
+      toast.error(t("admin.translateEmpty"));
+      return;
+    }
+
+    const to = from === "fr" ? "ht" : "fr";
+    setTranslating(field);
+    try {
+      const result = await runTranslate({ data: { text, from, to } });
+      const key = `${field}_${to}` as "name_fr" | "name_ht" | "description_fr" | "description_ht";
+      setForm((current) => ({ ...current, [key]: result.text }));
+      toast.success(t("admin.translated"));
+    } catch (error) {
+      console.error(error);
+      toast.error(t("admin.translateError"));
+    } finally {
+      setTranslating(null);
+    }
+  }
+
 
   const products = useQuery({
     queryKey: ["admin-products"],
