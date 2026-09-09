@@ -57,11 +57,23 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
+const fallbackValue: I18nValue = {
+  lang: "fr",
+  setLang: () => {},
+  t: (key, vars) => {
+    const raw = dictionaries.fr[key] ?? key;
+    if (!vars) return raw;
+    return Object.entries(vars).reduce(
+      (acc, [name, value]) => acc.replaceAll(`{${name}}`, String(value)),
+      raw,
+    );
+  },
+};
+
 export function useI18n() {
-  const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error("useI18n must be used inside I18nProvider");
-  return ctx;
+  return useContext(I18nContext) ?? fallbackValue;
 }
+
 
 /** Picks the field for the active language, e.g. localized(product, "name") */
 export function localized<T extends Record<string, unknown>>(
