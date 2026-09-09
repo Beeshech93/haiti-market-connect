@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star } from "lucide-react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { localized, useI18n } from "@/i18n";
 import { productImage } from "@/lib/catalog";
 import { useAuth } from "@/lib/auth-context";
+import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites";
 import { discountPercent, effectivePrice, formatHTG } from "@/lib/format";
 import type { Product } from "@/lib/types";
