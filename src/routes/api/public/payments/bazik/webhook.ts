@@ -4,35 +4,44 @@ import { z } from "zod";
 import { BazikService } from "@/lib/bazik.server";
 
 const payloadSchema = z.object({
+  type: z.string().max(120).optional(),
   event: z.string().max(120).optional(),
   event_id: z.string().max(200).optional(),
-  id: z.string().max(200).optional(),
-  payment_id: z.string().max(200).optional(),
-  transaction_id: z.string().max(200).optional(),
+  orderId: z.string().max(200).optional(),
+  order_id: z.string().max(200).optional(),
+  referenceId: z.string().max(200).optional(),
+  reference_id: z.string().max(200).optional(),
   reference: z.string().max(200).optional(),
-  status: z.string().max(60),
-  amount: z.coerce.number().nonnegative(),
+  transactionId: z.string().max(200).optional(),
+  transaction_id: z.string().max(200).optional(),
+  status: z.string().max(60).optional(),
+  amount: z.coerce.number().nonnegative().optional(),
+  gourdes: z.coerce.number().nonnegative().optional(),
   currency: z.string().max(10).optional(),
 });
 
 /**
  * POST /api/public/payments/bazik/webhook
  *
- * The single source of truth for "the order is paid". Verifies the signature,
- * the reference, the amount and the status, and is safe to receive twice.
+ * The single source of truth for "the order is paid". The notification is only
+ * a trigger: the status and the amount are always re-read from the Bazik API
+ * (GET /order/{orderId}) before an order is marked as paid. Safe to receive twice.
  */
 export const Route = createFileRoute("/api/public/payments/bazik/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         const raw = await request.text();
-        const signature =
-          request.headers.get("x-bazik-signature") ??
-          request.headers.get("x-signature") ??
-          request.headers.get("x-webhook-signature");
 
-        if (!BazikService.verifyWebhookSignature(raw, signature)) {
-          return new Response("Invalid signature", { status: 401 });
+        // When a shared secret is configured, the signature must match.
+        if (BazikService.webhookSignatureConfigured()) {
+          const signature =
+            request.headers.get("x-bazik-signature") ??
+            request.headers.get("x-signature") ??
+            request.headers.get("x-webhook-signature");
+          if (!BazikService.verifyWebhookSignature(raw, signature)) {
+            return new Response("Invalid signature", { status: 401 });
+          }
         }
 
         let body: z.infer<typeof payloadSchema>;
@@ -42,49 +51,78 @@ export const Route = createFileRoute("/api/public/payments/bazik/webhook")({
           return new Response("Invalid payload", { status: 400 });
         }
 
+        const orderId = body.orderId ?? body.order_id ?? null;
+        const reference = body.referenceId ?? body.reference_id ?? body.reference ?? null;
+        if (!orderId && !reference) return new Response("Missing identifier", { status: 400 });
+
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        const bazikPaymentId = body.payment_id ?? body.id ?? null;
-        let query = supabaseAdmin.from("payments").select("*").limit(1);
-        query = body.reference
-          ? query.eq("reference_id", body.reference)
-          : query.eq("bazik_payment_id", bazikPaymentId ?? "");
-        const { data: payments } = await query;
+        const { data: payments } = orderId
+          ? await supabaseAdmin.from("payments").select("*").eq("bazik_payment_id", orderId).limit(1)
+          : await supabaseAdmin.from("payments").select("*").eq("reference_id", reference ?? "").limit(1);
         const payment = payments?.[0];
-
         if (!payment) return new Response("Payment not found", { status: 404 });
 
         // Idempotency: an event already recorded is acknowledged, not re-applied.
+        const eventName = body.type ?? body.event ?? "webhook";
         const externalEventId =
-          body.event_id ?? (bazikPaymentId ? `${bazikPaymentId}:${body.status}` : null);
-        if (externalEventId) {
-          const { data: seen } = await supabaseAdmin
-            .from("payment_transactions")
-            .select("id")
-            .eq("external_event_id", externalEventId)
-            .maybeSingle();
-          if (seen) return Response.json({ received: true, duplicate: true });
-        }
+          body.event_id ?? `${orderId ?? reference}:${eventName}:${body.status ?? "unknown"}`;
+        const { data: seen } = await supabaseAdmin
+          .from("payment_transactions")
+          .select("id")
+          .eq("external_event_id", externalEventId)
+          .maybeSingle();
+        if (seen) return Response.json({ received: true, duplicate: true });
 
-        const amountMatches = Math.round(Number(body.amount)) === Math.round(Number(payment.amount));
-        const status = BazikService.mapStatus(body.status);
+        const bazikOrderId = orderId ?? payment.bazik_payment_id;
+        let status = BazikService.mapStatus(body.status ?? "pending");
+        let remoteRaw: unknown = JSON.parse(raw);
+        let transactionId = body.transactionId ?? body.transaction_id ?? payment.transaction_id;
+
+        // Authoritative re-check against the Bazik API.
+        if (bazikOrderId && BazikService.isConfigured()) {
+          try {
+            const { ok, payment: remote } = await BazikService.verifyPayment({
+              paymentId: bazikOrderId,
+              expectedAmount: Number(payment.amount),
+              expectedReference: payment.reference_id,
+            });
+            remoteRaw = remote.raw;
+            transactionId = remote.transactionId ?? transactionId;
+            const remoteStatus = BazikService.mapStatus(remote.status);
+            if (remoteStatus === "PAID" && !ok) {
+              console.error("Bazik webhook verification mismatch", {
+                payment: payment.id,
+                expected: payment.amount,
+                received: remote.amount,
+                reference: remote.reference,
+              });
+              await supabaseAdmin.from("payment_transactions").insert({
+                payment_id: payment.id,
+                event: `${eventName}:mismatch`,
+                status: payment.status,
+                external_event_id: externalEventId,
+                raw_payload: remote.raw as never,
+              });
+              return new Response("Verification mismatch", { status: 409 });
+            }
+            status = remoteStatus;
+          } catch (verifyError) {
+            console.error("Bazik webhook verification failed", verifyError);
+            return new Response("Verification failed", { status: 502 });
+          }
+        } else if (status === "PAID") {
+          // Never trust an unverifiable "paid" notification.
+          return new Response("Verification unavailable", { status: 503 });
+        }
 
         await supabaseAdmin.from("payment_transactions").insert({
           payment_id: payment.id,
-          event: body.event ?? "webhook",
+          event: eventName,
           status,
           external_event_id: externalEventId,
-          raw_payload: JSON.parse(raw) as never,
+          raw_payload: remoteRaw as never,
         });
-
-        if (status === "PAID" && !amountMatches) {
-          console.error("Bazik webhook amount mismatch", {
-            payment: payment.id,
-            expected: payment.amount,
-            received: body.amount,
-          });
-          return new Response("Amount mismatch", { status: 409 });
-        }
 
         if (payment.status === "PAID") {
           return Response.json({ received: true, alreadyPaid: true });
@@ -94,8 +132,8 @@ export const Route = createFileRoute("/api/public/payments/bazik/webhook")({
           .from("payments")
           .update({
             status,
-            transaction_id: body.transaction_id ?? payment.transaction_id,
-            bazik_payment_id: bazikPaymentId ?? payment.bazik_payment_id,
+            transaction_id: transactionId,
+            bazik_payment_id: bazikOrderId ?? payment.bazik_payment_id,
           })
           .eq("id", payment.id);
 
