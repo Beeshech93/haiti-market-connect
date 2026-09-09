@@ -15,7 +15,16 @@ type I18nValue = {
   t: (key: string, vars?: Record<string, string | number>) => string;
 };
 
-const I18nContext = createContext<I18nValue | null>(null);
+// Keep a single context instance even if this module is evaluated twice
+// (route code-splitting can produce duplicate module instances in dev).
+const globalStore = globalThis as typeof globalThis & {
+  __achtelaI18nContext?: React.Context<I18nValue | null>;
+};
+
+const I18nContext =
+  globalStore.__achtelaI18nContext ??
+  (globalStore.__achtelaI18nContext = createContext<I18nValue | null>(null));
+
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("fr");
@@ -48,11 +57,23 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
+const fallbackValue: I18nValue = {
+  lang: "fr",
+  setLang: () => {},
+  t: (key, vars) => {
+    const raw = dictionaries.fr[key] ?? key;
+    if (!vars) return raw;
+    return Object.entries(vars).reduce(
+      (acc, [name, value]) => acc.replaceAll(`{${name}}`, String(value)),
+      raw,
+    );
+  },
+};
+
 export function useI18n() {
-  const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error("useI18n must be used inside I18nProvider");
-  return ctx;
+  return useContext(I18nContext) ?? fallbackValue;
 }
+
 
 /** Picks the field for the active language, e.g. localized(product, "name") */
 export function localized<T extends Record<string, unknown>>(
