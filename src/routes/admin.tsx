@@ -44,7 +44,10 @@ function AdminLayout() {
     );
   }
 
-  const tabs: { to: string; label: string }[] = [
+  const tabs: {
+    to: "/admin" | "/admin/products" | "/admin/orders" | "/admin/finance";
+    label: string;
+  }[] = [
     { to: "/admin", label: t("admin.overview") },
     { to: "/admin/products", label: t("admin.products") },
     { to: "/admin/orders", label: t("admin.orders") },
