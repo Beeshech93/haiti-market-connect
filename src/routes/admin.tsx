@@ -51,7 +51,7 @@ function AdminLayout() {
     { to: "/admin", label: t("admin.overview") },
     { to: "/admin/products", label: t("admin.products") },
     { to: "/admin/orders", label: t("admin.orders") },
-    ...(isFinance ? [{ to: "/admin/finance", label: t("admin.finance") }] : []),
+    ...(isFinance ? [{ to: "/admin/finance" as const, label: t("admin.finance") }] : []),
   ];
 
   return (
