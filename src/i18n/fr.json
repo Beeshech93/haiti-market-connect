@@ -203,5 +203,13 @@
   "admin.editProduct": "Modifier le produit",
   "admin.update": "Mettre à jour",
   "admin.updated": "Produit mis à jour",
-  "admin.cancelEdit": "Annuler la modification"
+  "admin.cancelEdit": "Annuler la modification",
+  "admin.uploadImages": "Ajouter des photos",
+  "admin.uploading": "Envoi en cours...",
+  "admin.uploadError": "L'envoi de l'image a échoué.",
+  "admin.removeImage": "Supprimer l'image",
+  "admin.moveUp": "Déplacer vers le haut",
+  "admin.moveDown": "Déplacer vers le bas",
+  "admin.noImages": "Aucune photo pour le moment.",
+  "admin.imageUrl": "Ou coller un lien d'image"
 }

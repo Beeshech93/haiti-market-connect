@@ -527,3 +527,141 @@ function TextField({
     </div>
   );
 }
+
+function ImageUploader({
+  urls,
+  onChange,
+}: {
+  urls: string[];
+  onChange: (urls: string[]) => void;
+}) {
+  const { t } = useI18n();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(0);
+  const [externalUrl, setExternalUrl] = useState("");
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const list = Array.from(files);
+    setUploading((count) => count + list.length);
+    const uploaded: string[] = [];
+
+    for (const file of list) {
+      const extension = (file.name.split(".").pop() ?? "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}.${extension || "jpg"}`;
+      const { error } = await supabase.storage
+        .from("product-images")
+        .upload(path, file, { contentType: file.type || undefined, upsert: false });
+
+      if (error) {
+        console.error(error);
+        toast.error(t("admin.uploadError"));
+      } else {
+        uploaded.push(`/api/public/images/${path}`);
+      }
+      setUploading((count) => Math.max(0, count - 1));
+    }
+
+    if (uploaded.length > 0) onChange([...urls, ...uploaded]);
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+  const move = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= urls.length) return;
+    const next = [...urls];
+    const [item] = next.splice(index, 1);
+    next.splice(target, 0, item as string);
+    onChange(next);
+  };
+
+  const addExternal = () => {
+    const value = externalUrl.trim();
+    if (!value) return;
+    onChange([...urls, value]);
+    setExternalUrl("");
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label>{t("admin.images")}</Label>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(event) => void handleFiles(event.target.files)}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full rounded-full"
+        disabled={uploading > 0}
+        onClick={() => inputRef.current?.click()}
+      >
+        {uploading > 0 ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <ImagePlus className="size-4" />
+        )}
+        {uploading > 0 ? t("admin.uploading") : t("admin.uploadImages")}
+      </Button>
+
+      {urls.length > 0 ? (
+        <ul className="grid grid-cols-3 gap-2">
+          {urls.map((url, index) => (
+            <li key={`${url}-${index}`} className="relative overflow-hidden rounded-lg border border-border">
+              <img src={url} alt="" className="aspect-square w-full object-cover" loading="lazy" />
+              <button
+                type="button"
+                aria-label={t("admin.removeImage")}
+                className="absolute right-1 top-1 rounded-full bg-background/90 p-1 text-foreground shadow"
+                onClick={() => onChange(urls.filter((_, position) => position !== index))}
+              >
+                <X className="size-3.5" />
+              </button>
+              <div className="flex justify-center gap-1 bg-muted/60 p-1">
+                <button
+                  type="button"
+                  aria-label={t("admin.moveUp")}
+                  disabled={index === 0}
+                  className="rounded p-1 disabled:opacity-40"
+                  onClick={() => move(index, -1)}
+                >
+                  <ArrowUp className="size-3.5" />
+                </button>
+                <button
+                  type="button"
+                  aria-label={t("admin.moveDown")}
+                  disabled={index === urls.length - 1}
+                  className="rounded p-1 disabled:opacity-40"
+                  onClick={() => move(index, 1)}
+                >
+                  <ArrowDown className="size-3.5" />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-xs text-muted-foreground">{t("admin.noImages")}</p>
+      )}
+
+      <div className="flex items-end gap-2">
+        <div className="flex-1 space-y-1.5">
+          <Label className="text-xs">{t("admin.imageUrl")}</Label>
+          <Input
+            value={externalUrl}
+            placeholder="https://"
+            onChange={(event) => setExternalUrl(event.target.value)}
+          />
+        </div>
+        <Button type="button" variant="outline" size="icon" className="rounded-full" onClick={addExternal}>
+          <Plus className="size-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
