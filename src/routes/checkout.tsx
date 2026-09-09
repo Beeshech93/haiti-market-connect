@@ -141,6 +141,8 @@ function CheckoutPage() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "";
       if (message.includes("BAZIK_NOT_CONFIGURED")) toast.error(t("checkout.paymentUnavailable"));
+      else if (message.includes("BAZIK_PROVIDER_UNSUPPORTED")) toast.error(t("checkout.natcashUnavailable"));
+      else if (message.includes("BAZIK_AMOUNT_TOO_LARGE")) toast.error(t("checkout.amountTooLarge"));
       else if (message.includes("INSUFFICIENT_STOCK")) toast.error(t("product.outOfStock"));
       else toast.error(t("error.payment"));
     } finally {
@@ -261,11 +263,12 @@ function CheckoutPage() {
                 {(["MONCASH", "NATCASH"] as Provider[]).map((item) => (
                   <label
                     key={item}
-                    className="flex cursor-pointer items-center gap-2 rounded-xl border border-border p-4 has-[:checked]:border-primary"
+                    className="flex items-center gap-2 rounded-xl border border-border p-4 has-[:checked]:border-primary has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50"
                   >
                     <input
                       type="radio"
                       name="provider"
+                      disabled={item === "NATCASH"}
                       checked={provider === item}
                       onChange={() => setProvider(item)}
                     />
@@ -275,6 +278,7 @@ function CheckoutPage() {
                   </label>
                 ))}
               </div>
+              <p className="text-xs text-muted-foreground">{t("checkout.natcashUnavailable")}</p>
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" className="rounded-full" onClick={() => setStep(1)}>
                   {t("common.back")}

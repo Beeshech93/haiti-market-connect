@@ -178,5 +178,7 @@
   "admin.status": "Statut",
   "admin.updateStatus": "Mettre à jour",
   "admin.featured": "Mettre en avant",
-  "admin.customer": "Client"
+  "admin.customer": "Client",
+  "checkout.natcashUnavailable": "NatCash n'est pas encore disponible pour le paiement. Utilisez MonCash.",
+  "checkout.amountTooLarge": "Le montant dépasse la limite MonCash de 75 000 HTG."
 }

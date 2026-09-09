@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { BAZIK_NOT_CONFIGURED, BazikService } from "@/lib/bazik.server";
+import { BAZIK_NOT_CONFIGURED, BAZIK_PROVIDER_UNSUPPORTED, BazikService } from "@/lib/bazik.server";
 
 const APP_URL = "https://project--77f99939-b7be-49f7-b3b6-25711475e711.lovable.app";
 
@@ -70,10 +70,15 @@ export const createPayment = createServerFn({ method: "POST" })
           email: order.customer_email,
         },
         returnUrl: `${appUrl()}/payment/success?order=${order.order_number}`,
+        errorUrl: `${appUrl()}/payment/success?order=${order.order_number}&status=error`,
         webhookUrl: `${appUrl()}/api/public/payments/bazik/webhook`,
       });
     } catch (bazikError) {
       console.error("Bazik createPayment failed", bazikError);
+      const message = bazikError instanceof Error ? bazikError.message : "";
+      // Bazik collects customer payments through MonCash only.
+      if (message === BAZIK_PROVIDER_UNSUPPORTED) throw new Error(BAZIK_PROVIDER_UNSUPPORTED);
+      if (message === "BAZIK_AMOUNT_TOO_LARGE") throw new Error("BAZIK_AMOUNT_TOO_LARGE");
       throw new Error("PAYMENT_CREATE_FAILED");
     }
 
