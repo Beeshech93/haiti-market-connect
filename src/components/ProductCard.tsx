@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star } from "lucide-react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { localized, useI18n } from "@/i18n";
 import { productImage } from "@/lib/catalog";
 import { useAuth } from "@/lib/auth-context";
+import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites";
 import { discountPercent, effectivePrice, formatHTG } from "@/lib/format";
 import type { Product } from "@/lib/types";
@@ -14,11 +16,13 @@ import { cn } from "@/lib/utils";
 export function ProductCard({ product }: { product: Product }) {
   const { lang, t } = useI18n();
   const { user } = useAuth();
+  const { addItem } = useCart();
   const { isFavorite, toggle } = useFavorites();
   const image = productImage(product);
   const price = effectivePrice(product);
   const discount = discountPercent(Number(product.selling_price), product.sale_price);
   const favorite = user ? isFavorite(product.id) : false;
+  const outOfStock = product.stock <= 0;
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-shadow hover:shadow-float">
@@ -90,6 +94,22 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           ) : null}
         </div>
+        <Button
+          type="button"
+          size="sm"
+          disabled={outOfStock}
+          className="mt-2 w-full rounded-full"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (outOfStock) return;
+            addItem(product, 1);
+            toast.success(t("product.added"));
+          }}
+        >
+          <ShoppingCart className="mr-1.5 size-4" />
+          {outOfStock ? t("product.outOfStock") : t("product.addToCart")}
+        </Button>
       </div>
     </div>
   );
