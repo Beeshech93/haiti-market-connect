@@ -109,6 +109,24 @@ function AdminProducts() {
         .insert(urls.map((url, index) => ({ product_id: product.id, url, sort_order: index })));
     }
 
+    const sizes = form.sizes
+      .split(/[,\n]/)
+      .map((size) => size.trim())
+      .filter(Boolean);
+    if (sizes.length > 0) {
+      const extraPrice = Number(form.size_extra_price || 0);
+      await supabase.from("product_variants").insert(
+        sizes.map((size, index) => ({
+          product_id: product.id,
+          kind: "size",
+          value: size,
+          extra_price: extraPrice,
+          sort_order: index,
+        })),
+      );
+    }
+
+
     setBusy(false);
     setForm(EMPTY);
     toast.success(t("admin.saved"));
