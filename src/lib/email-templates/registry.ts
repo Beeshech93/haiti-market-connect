@@ -1,5 +1,8 @@
 import type { ComponentType } from 'react'
 
+import { template as orderConfirmationTemplate } from './order-confirmation'
+
+
 export interface TemplateEntry {
   component: ComponentType<any>
   subject: string | ((data: Record<string, any>) => string)
