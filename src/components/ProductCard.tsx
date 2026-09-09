@@ -16,11 +16,13 @@ import { cn } from "@/lib/utils";
 export function ProductCard({ product }: { product: Product }) {
   const { lang, t } = useI18n();
   const { user } = useAuth();
+  const { addItem } = useCart();
   const { isFavorite, toggle } = useFavorites();
   const image = productImage(product);
   const price = effectivePrice(product);
   const discount = discountPercent(Number(product.selling_price), product.sale_price);
   const favorite = user ? isFavorite(product.id) : false;
+  const outOfStock = product.stock <= 0;
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-shadow hover:shadow-float">
