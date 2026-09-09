@@ -30,6 +30,8 @@ const EMPTY = {
   stock: "0",
   category_id: "",
   images: "",
+  sizes: "",
+  size_extra_price: "",
   is_featured: false,
 };
 
