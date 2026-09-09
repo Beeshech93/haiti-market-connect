@@ -198,5 +198,10 @@
   "admin.transactions": "tranzaksyon",
   "admin.unitsSold": "Kantite vann",
   "admin.product": "Pwodwi",
-  "admin.noFinanceData": "Pa gen done finansye pou kounye a."
+  "admin.noFinanceData": "Pa gen done finansye pou kounye a.",
+  "admin.edit": "Modifye",
+  "admin.editProduct": "Modifye pwodwi a",
+  "admin.update": "Mete ajou",
+  "admin.updated": "Pwodwi a mete ajou",
+  "admin.cancelEdit": "Anile modifikasyon"
 }

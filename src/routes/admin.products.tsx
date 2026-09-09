@@ -54,6 +54,7 @@ function AdminProducts() {
   const queryClient = useQueryClient();
   const categories = useQuery(categoriesQuery());
   const [form, setForm] = useState(EMPTY);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [translating, setTranslating] = useState<"name" | "description" | null>(null);
   const runTranslate = useServerFn(translateText);
@@ -108,6 +109,52 @@ function AdminProducts() {
     },
   });
 
+  const startEdit = async (id: string) => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*, product_images(url, sort_order), product_variants(kind, value, extra_price, sort_order)")
+      .eq("id", id)
+      .single();
+
+    if (error || !data) {
+      toast.error(t("error.generic"));
+      return;
+    }
+
+    const images = [...(data.product_images ?? [])]
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((image) => image.url);
+    const variants = [...(data.product_variants ?? [])]
+      .filter((variant) => variant.kind === "size")
+      .sort((a, b) => a.sort_order - b.sort_order);
+
+    setEditingId(id);
+    setForm({
+      name_fr: data.name_fr ?? "",
+      name_ht: data.name_ht ?? "",
+      description_fr: data.description_fr ?? "",
+      description_ht: data.description_ht ?? "",
+      source: data.source ?? "SHEIN",
+      source_url: data.source_url ?? "",
+      purchase_price: String(data.purchase_price ?? ""),
+      selling_price: String(data.selling_price ?? ""),
+      sale_price: data.sale_price === null ? "" : String(data.sale_price),
+      shipping_cost: String(data.shipping_cost ?? ""),
+      stock: String(data.stock ?? 0),
+      category_id: data.category_id ?? "",
+      images: images.join("\n"),
+      sizes: variants.map((variant) => variant.value).join(", "),
+      size_extra_price: variants[0] ? String(variants[0].extra_price ?? 0) : "",
+      is_featured: data.is_featured ?? false,
+    });
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm(EMPTY);
+  };
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!form.name_fr || !form.name_ht || !form.selling_price) {
@@ -115,52 +162,76 @@ function AdminProducts() {
       return;
     }
     setBusy(true);
-    const { data: product, error } = await supabase
-      .from("products")
-      .insert({
-        slug: `${slugify(form.name_fr)}-${Date.now().toString(36)}`,
-        name_fr: form.name_fr,
-        name_ht: form.name_ht,
-        description_fr: form.description_fr || null,
-        description_ht: form.description_ht || null,
-        source: form.source as "SHEIN" | "TEMU" | "AUTRE",
-        source_url: form.source_url || null,
-        purchase_price: Number(form.purchase_price || 0),
-        selling_price: Number(form.selling_price),
-        sale_price: form.sale_price ? Number(form.sale_price) : null,
-        shipping_cost: Number(form.shipping_cost || 0),
-        stock: Number(form.stock || 0),
-        category_id: form.category_id || null,
-        is_featured: form.is_featured,
-      })
-      .select("id")
-      .single();
 
-    if (error || !product) {
-      setBusy(false);
-      toast.error(t("error.generic"));
-      return;
+    const payload = {
+      name_fr: form.name_fr,
+      name_ht: form.name_ht,
+      description_fr: form.description_fr || null,
+      description_ht: form.description_ht || null,
+      source: form.source as "SHEIN" | "TEMU" | "AUTRE",
+      source_url: form.source_url || null,
+      purchase_price: Number(form.purchase_price || 0),
+      selling_price: Number(form.selling_price),
+      sale_price: form.sale_price ? Number(form.sale_price) : null,
+      shipping_cost: Number(form.shipping_cost || 0),
+      stock: Number(form.stock || 0),
+      category_id: form.category_id || null,
+      is_featured: form.is_featured,
+    };
+
+    let productId = editingId;
+
+    if (editingId) {
+      const { error } = await supabase.from("products").update(payload).eq("id", editingId);
+      if (error) {
+        setBusy(false);
+        toast.error(t("error.generic"));
+        return;
+      }
+    } else {
+      const { data: product, error } = await supabase
+        .from("products")
+        .insert({ ...payload, slug: `${slugify(form.name_fr)}-${Date.now().toString(36)}` })
+        .select("id")
+        .single();
+
+      if (error || !product) {
+        setBusy(false);
+        toast.error(t("error.generic"));
+        return;
+      }
+      productId = product.id;
     }
 
     const urls = form.images
       .split("\n")
       .map((line) => line.trim())
       .filter(Boolean);
+    if (editingId) {
+      await supabase.from("product_images").delete().eq("product_id", productId!);
+    }
     if (urls.length > 0) {
       await supabase
         .from("product_images")
-        .insert(urls.map((url, index) => ({ product_id: product.id, url, sort_order: index })));
+        .insert(urls.map((url, index) => ({ product_id: productId!, url, sort_order: index })));
     }
 
     const sizes = form.sizes
       .split(/[,\n]/)
       .map((size) => size.trim())
       .filter(Boolean);
+    if (editingId) {
+      await supabase
+        .from("product_variants")
+        .delete()
+        .eq("product_id", productId!)
+        .eq("kind", "size");
+    }
     if (sizes.length > 0) {
       const extraPrice = Number(form.size_extra_price || 0);
       await supabase.from("product_variants").insert(
         sizes.map((size, index) => ({
-          product_id: product.id,
+          product_id: productId!,
           kind: "size",
           value: size,
           extra_price: extraPrice,
@@ -169,10 +240,11 @@ function AdminProducts() {
       );
     }
 
-
+    const wasEditing = editingId !== null;
     setBusy(false);
+    setEditingId(null);
     setForm(EMPTY);
-    toast.success(t("admin.saved"));
+    toast.success(wasEditing ? t("admin.updated") : t("admin.saved"));
     await queryClient.invalidateQueries({ queryKey: ["admin-products"] });
     await queryClient.invalidateQueries({ queryKey: ["products"] });
   };
@@ -191,7 +263,9 @@ function AdminProducts() {
         onSubmit={submit}
         className="h-fit space-y-3 rounded-2xl border border-border bg-card p-5 shadow-card"
       >
-        <h2 className="font-bold">{t("admin.newProduct")}</h2>
+        <h2 className="font-bold">
+          {editingId ? t("admin.editProduct") : t("admin.newProduct")}
+        </h2>
 
         <div className="space-y-1.5">
           <Label>{t("admin.source")}</Label>
@@ -345,8 +419,18 @@ function AdminProducts() {
         </label>
 
         <Button type="submit" disabled={busy} className="w-full rounded-full">
-          {busy ? t("loading") : t("common.save")}
+          {busy ? t("loading") : editingId ? t("admin.update") : t("common.save")}
         </Button>
+        {editingId ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full rounded-full"
+            onClick={cancelEdit}
+          >
+            {t("admin.cancelEdit")}
+          </Button>
+        ) : null}
       </form>
 
       <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
@@ -363,14 +447,24 @@ function AdminProducts() {
                   {formatHTG(Number(product.sale_price ?? product.selling_price))}
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="shrink-0 rounded-full"
-                onClick={() => void toggleStatus(product.id, product.status)}
-              >
-                {product.status === "ACTIVE" ? "ACTIVE" : "INACTIVE"}
-              </Button>
+              <div className="flex shrink-0 items-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => void startEdit(product.id)}
+                >
+                  {t("admin.edit")}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => void toggleStatus(product.id, product.status)}
+                >
+                  {product.status === "ACTIVE" ? "ACTIVE" : "INACTIVE"}
+                </Button>
+              </div>
             </li>
           ))}
         </ul>
