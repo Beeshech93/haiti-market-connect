@@ -379,6 +379,39 @@ function AdminProducts() {
   );
 }
 
+function TranslateButton({
+  busy,
+  disabled,
+  label,
+  busyLabel,
+  onClick,
+}: {
+  busy: boolean;
+  disabled: boolean;
+  label: string;
+  busyLabel: string;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="shrink-0 rounded-full text-xs"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {busy ? (
+        <Loader2 className="size-3.5 animate-spin" />
+      ) : (
+        <Languages className="size-3.5" />
+      )}
+      {busy ? busyLabel : label}
+    </Button>
+  );
+}
+
+
 function TextField({
   label,
   value,
