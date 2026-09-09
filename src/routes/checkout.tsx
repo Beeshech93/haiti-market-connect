@@ -141,6 +141,8 @@ function CheckoutPage() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "";
       if (message.includes("BAZIK_NOT_CONFIGURED")) toast.error(t("checkout.paymentUnavailable"));
+      else if (message.includes("BAZIK_PROVIDER_UNSUPPORTED")) toast.error(t("checkout.natcashUnavailable"));
+      else if (message.includes("BAZIK_AMOUNT_TOO_LARGE")) toast.error(t("checkout.amountTooLarge"));
       else if (message.includes("INSUFFICIENT_STOCK")) toast.error(t("product.outOfStock"));
       else toast.error(t("error.payment"));
     } finally {

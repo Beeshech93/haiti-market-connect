@@ -178,5 +178,7 @@
   "admin.status": "Estati",
   "admin.updateStatus": "Mete ajou",
   "admin.featured": "Mete devan",
-  "admin.customer": "Kliyan"
+  "admin.customer": "Kliyan",
+  "checkout.natcashUnavailable": "NatCash poko disponib pou peman. Sèvi ak MonCash.",
+  "checkout.amountTooLarge": "Montan an depase limit MonCash 75 000 HTG."
 }

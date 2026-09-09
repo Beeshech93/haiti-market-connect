@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { BAZIK_NOT_CONFIGURED, BazikService } from "@/lib/bazik.server";
+import { BAZIK_NOT_CONFIGURED, BAZIK_PROVIDER_UNSUPPORTED, BazikService } from "@/lib/bazik.server";
 
 const APP_URL = "https://project--77f99939-b7be-49f7-b3b6-25711475e711.lovable.app";
 
