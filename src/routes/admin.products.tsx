@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Languages, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { ArrowDown, ArrowUp, ImagePlus, Languages, Loader2, Plus, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -383,14 +383,10 @@ function AdminProducts() {
           />
         </div>
 
-        <div className="space-y-1.5">
-          <Label>{t("admin.images")}</Label>
-          <Textarea
-            rows={3}
-            value={form.images}
-            onChange={(event) => setForm({ ...form, images: event.target.value })}
-          />
-        </div>
+        <ImageUploader
+          urls={form.images.split("\n").map((line) => line.trim()).filter(Boolean)}
+          onChange={(urls) => setForm((current) => ({ ...current, images: urls.join("\n") }))}
+        />
 
         <div className="grid grid-cols-2 gap-3">
           <TextField
