@@ -19,32 +19,32 @@ import { localized, useI18n } from "@/i18n";
 import { categoriesQuery, productsQuery, type ProductFilters } from "@/lib/catalog";
 
 type CatalogSearch = {
-  q?: string;
-  category?: string;
-  promo?: boolean;
-  sort?: ProductFilters["sort"];
-  min?: number;
-  max?: number;
-  stock?: boolean;
+  q?: string | undefined;
+  category?: string | undefined;
+  promo?: boolean | undefined;
+  sort?: ProductFilters["sort"] | undefined;
+  min?: number | undefined;
+  max?: number | undefined;
+  stock?: boolean | undefined;
 };
 
 export const Route = createFileRoute("/products")({
   validateSearch: (search: Record<string, unknown>): CatalogSearch => ({
-    q: typeof search.q === "string" && search.q ? search.q : undefined,
-    category: typeof search.category === "string" && search.category ? search.category : undefined,
-    promo: search.promo === true || search.promo === "true" ? true : undefined,
+    q: typeof search["q"] === "string" && search["q"] ? search["q"] : undefined,
+    category: typeof search["category"] === "string" && search["category"] ? search["category"] : undefined,
+    promo: search["promo"] === true || search["promo"] === "true" ? true : undefined,
     sort: (["newest", "priceAsc", "priceDesc", "popular"] as const).includes(
-      search.sort as never,
+      search["sort"] as never,
     )
-      ? (search.sort as ProductFilters["sort"])
+      ? (search["sort"] as ProductFilters["sort"])
       : undefined,
-    min: Number.isFinite(Number(search.min)) && search.min !== undefined && search.min !== ""
-      ? Number(search.min)
+    min: Number.isFinite(Number(search["min"])) && search["min"] !== undefined && search["min"] !== ""
+      ? Number(search["min"])
       : undefined,
-    max: Number.isFinite(Number(search.max)) && search.max !== undefined && search.max !== ""
-      ? Number(search.max)
+    max: Number.isFinite(Number(search["max"])) && search["max"] !== undefined && search["max"] !== ""
+      ? Number(search["max"])
       : undefined,
-    stock: search.stock === true || search.stock === "true" ? true : undefined,
+    stock: search["stock"] === true || search["stock"] === "true" ? true : undefined,
   }),
   head: () => ({
     meta: [

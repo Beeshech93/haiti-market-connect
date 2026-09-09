@@ -10,17 +10,31 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
+import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
+import { Route as ApiPublicPaymentsBazikWebhookRouteImport } from './routes/api/public/payments/bazik/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -33,9 +47,19 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FavoritesRoute = FavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsRoute = ProductsRouteImport.update({
@@ -53,84 +77,172 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const OrdersOrderIdRoute = OrdersOrderIdRouteImport.update({
+  id: '/$orderId',
+  path: '/$orderId',
+  getParentRoute: () => OrdersRoute,
+} as any)
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment/success',
+  path: '/payment/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsSlugRoute = ProductsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ProductsRoute,
 } as any)
+const ApiPublicPaymentsBazikWebhookRoute =
+  ApiPublicPaymentsBazikWebhookRouteImport.update({
+    id: '/api/public/payments/bazik/webhook',
+    path: '/api/public/payments/bazik/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
   '/favorites': typeof FavoritesRoute
+  '/orders': typeof OrdersRouteWithChildren
   '/products': typeof ProductsRouteWithChildren
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
+  '/admin/': typeof AdminIndexRoute
+  '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
   '/favorites': typeof FavoritesRoute
+  '/orders': typeof OrdersRouteWithChildren
   '/products': typeof ProductsRouteWithChildren
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
+  '/admin': typeof AdminIndexRoute
+  '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
   '/favorites': typeof FavoritesRoute
+  '/orders': typeof OrdersRouteWithChildren
   '/products': typeof ProductsRouteWithChildren
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
+  '/admin/': typeof AdminIndexRoute
+  '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/auth'
     | '/cart'
+    | '/checkout'
     | '/favorites'
+    | '/orders'
     | '/products'
     | '/profile'
     | '/reset-password'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/orders/$orderId'
+    | '/payment/success'
     | '/products/$slug'
+    | '/admin/'
+    | '/api/public/payments/bazik/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/cart'
+    | '/checkout'
     | '/favorites'
+    | '/orders'
     | '/products'
     | '/profile'
     | '/reset-password'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/orders/$orderId'
+    | '/payment/success'
     | '/products/$slug'
+    | '/admin'
+    | '/api/public/payments/bazik/webhook'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/auth'
     | '/cart'
+    | '/checkout'
     | '/favorites'
+    | '/orders'
     | '/products'
     | '/profile'
     | '/reset-password'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/orders/$orderId'
+    | '/payment/success'
     | '/products/$slug'
+    | '/admin/'
+    | '/api/public/payments/bazik/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
+  CheckoutRoute: typeof CheckoutRoute
   FavoritesRoute: typeof FavoritesRoute
+  OrdersRoute: typeof OrdersRouteWithChildren
   ProductsRoute: typeof ProductsRouteWithChildren
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
+  ApiPublicPaymentsBazikWebhookRoute: typeof ApiPublicPaymentsBazikWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -140,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -156,11 +275,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/favorites': {
       id: '/favorites'
       path: '/favorites'
       fullPath: '/favorites'
       preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/products': {
@@ -184,6 +317,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/orders/$orderId': {
+      id: '/orders/$orderId'
+      path: '/$orderId'
+      fullPath: '/orders/$orderId'
+      preLoaderRoute: typeof OrdersOrderIdRouteImport
+      parentRoute: typeof OrdersRoute
+    }
+    '/payment/success': {
+      id: '/payment/success'
+      path: '/payment/success'
+      fullPath: '/payment/success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products/$slug': {
       id: '/products/$slug'
       path: '/$slug'
@@ -191,8 +359,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsSlugRouteImport
       parentRoute: typeof ProductsRoute
     }
+    '/api/public/payments/bazik/webhook': {
+      id: '/api/public/payments/bazik/webhook'
+      path: '/api/public/payments/bazik/webhook'
+      fullPath: '/api/public/payments/bazik/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsBazikWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminProductsRoute: typeof AdminProductsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminOrdersRoute: AdminOrdersRoute,
+  AdminProductsRoute: AdminProductsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface OrdersRouteChildren {
+  OrdersOrderIdRoute: typeof OrdersOrderIdRoute
+}
+
+const OrdersRouteChildren: OrdersRouteChildren = {
+  OrdersOrderIdRoute: OrdersOrderIdRoute,
+}
+
+const OrdersRouteWithChildren =
+  OrdersRoute._addFileChildren(OrdersRouteChildren)
 
 interface ProductsRouteChildren {
   ProductsSlugRoute: typeof ProductsSlugRoute
@@ -208,12 +408,17 @@ const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
+  CheckoutRoute: CheckoutRoute,
   FavoritesRoute: FavoritesRoute,
+  OrdersRoute: OrdersRouteWithChildren,
   ProductsRoute: ProductsRouteWithChildren,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
+  ApiPublicPaymentsBazikWebhookRoute: ApiPublicPaymentsBazikWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
