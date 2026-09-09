@@ -1,12 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Heart, Minus, Package, Plus, ShieldCheck, Star, Truck } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Minus,
+  Package,
+  Plus,
+  ShieldCheck,
+  Star,
+  Truck,
+  X,
+  ZoomIn,
+} from "lucide-react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ProductGrid } from "@/components/ProductCard";
 import { ShopLayout } from "@/components/ShopLayout";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { localized, useI18n } from "@/i18n";
 import { useAuth } from "@/lib/auth-context";
