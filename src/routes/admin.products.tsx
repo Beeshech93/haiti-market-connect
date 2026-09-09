@@ -551,7 +551,7 @@ function ImageUploader({
       const path = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}.${extension || "jpg"}`;
       const { error } = await supabase.storage
         .from("product-images")
-        .upload(path, file, { contentType: file.type || undefined, upsert: false });
+        .upload(path, file, { ...(file.type ? { contentType: file.type } : {}), upsert: false });
 
       if (error) {
         console.error(error);
