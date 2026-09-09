@@ -15,7 +15,16 @@ type I18nValue = {
   t: (key: string, vars?: Record<string, string | number>) => string;
 };
 
-const I18nContext = createContext<I18nValue | null>(null);
+// Keep a single context instance even if this module is evaluated twice
+// (route code-splitting can produce duplicate module instances in dev).
+const globalStore = globalThis as typeof globalThis & {
+  __achtelaI18nContext?: React.Context<I18nValue | null>;
+};
+
+const I18nContext =
+  globalStore.__achtelaI18nContext ??
+  (globalStore.__achtelaI18nContext = createContext<I18nValue | null>(null));
+
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("fr");
