@@ -157,7 +157,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const idx = next.findIndex(
         (item) => item.product_id === product.id && sameOptions(item.options, options),
       );
-      if (idx >= 0) next[idx] = { ...next[idx], quantity: next[idx].quantity + quantity };
+      const current = idx >= 0 ? next[idx] : undefined;
+      if (current) next[idx] = { ...current, quantity: current.quantity + quantity };
       else next.push({ product_id: product.id, quantity, options });
       writeGuestCart(next);
       setGuestItems(next);
