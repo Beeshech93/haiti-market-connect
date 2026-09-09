@@ -203,5 +203,13 @@
   "admin.editProduct": "Modifye pwodwi a",
   "admin.update": "Mete ajou",
   "admin.updated": "Pwodwi a mete ajou",
-  "admin.cancelEdit": "Anile modifikasyon"
+  "admin.cancelEdit": "Anile modifikasyon",
+  "admin.uploadImages": "Ajoute foto",
+  "admin.uploading": "Y ap voye...",
+  "admin.uploadError": "Voye imaj la pa reyisi.",
+  "admin.removeImage": "Retire imaj la",
+  "admin.moveUp": "Monte",
+  "admin.moveDown": "Desann",
+  "admin.noImages": "Pa gen foto pou kounye a.",
+  "admin.imageUrl": "Oswa kole yon lyen imaj"
 }
