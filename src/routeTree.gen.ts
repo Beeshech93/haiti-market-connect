@@ -14,6 +14,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +43,16 @@ const ProductsRoute = ProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsSlugRoute = ProductsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -53,6 +65,8 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/favorites': typeof FavoritesRoute
   '/products': typeof ProductsRouteWithChildren
+  '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/products/$slug': typeof ProductsSlugRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +75,8 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/favorites': typeof FavoritesRoute
   '/products': typeof ProductsRouteWithChildren
+  '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/products/$slug': typeof ProductsSlugRoute
 }
 export interface FileRoutesById {
@@ -70,14 +86,31 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/favorites': typeof FavoritesRoute
   '/products': typeof ProductsRouteWithChildren
+  '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/products/$slug': typeof ProductsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/cart' | '/favorites' | '/products' | '/products/$slug'
+    | '/'
+    | '/auth'
+    | '/cart'
+    | '/favorites'
+    | '/products'
+    | '/profile'
+    | '/reset-password'
+    | '/products/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/cart' | '/favorites' | '/products' | '/products/$slug'
+  to:
+    | '/'
+    | '/auth'
+    | '/cart'
+    | '/favorites'
+    | '/products'
+    | '/profile'
+    | '/reset-password'
+    | '/products/$slug'
   id:
     | '__root__'
     | '/'
@@ -85,6 +118,8 @@ export interface FileRouteTypes {
     | '/cart'
     | '/favorites'
     | '/products'
+    | '/profile'
+    | '/reset-password'
     | '/products/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -94,6 +129,8 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   FavoritesRoute: typeof FavoritesRoute
   ProductsRoute: typeof ProductsRouteWithChildren
+  ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -133,6 +170,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products/$slug': {
       id: '/products/$slug'
       path: '/$slug'
@@ -161,6 +212,8 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   FavoritesRoute: FavoritesRoute,
   ProductsRoute: ProductsRouteWithChildren,
+  ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
