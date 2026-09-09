@@ -229,6 +229,18 @@ function AdminProducts() {
         </div>
 
         <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <Label>{t("admin.nameFr")} / {t("admin.nameHt")}</Label>
+            <TranslateButton
+              busy={translating === "name"}
+              disabled={translating !== null}
+              label={t("admin.translate")}
+              busyLabel={t("admin.translating")}
+              onClick={() => void handleTranslate("name")}
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
           <Label>{t("admin.descFr")}</Label>
           <Textarea
             rows={3}
@@ -237,13 +249,23 @@ function AdminProducts() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label>{t("admin.descHt")}</Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label>{t("admin.descHt")}</Label>
+            <TranslateButton
+              busy={translating === "description"}
+              disabled={translating !== null}
+              label={t("admin.translate")}
+              busyLabel={t("admin.translating")}
+              onClick={() => void handleTranslate("description")}
+            />
+          </div>
           <Textarea
             rows={3}
             value={form.description_ht}
             onChange={(event) => setForm({ ...form, description_ht: event.target.value })}
           />
         </div>
+
         <div className="space-y-1.5">
           <Label>{t("admin.images")}</Label>
           <Textarea
