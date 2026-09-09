@@ -253,6 +253,23 @@ function AdminProducts() {
           />
         </div>
 
+        <div className="grid grid-cols-2 gap-3">
+          <TextField
+            label={t("admin.sizes")}
+            value={form.sizes}
+            onChange={(value) => setForm({ ...form, sizes: value })}
+            placeholder="S, M, L, XL"
+          />
+          <TextField
+            label={t("admin.sizeExtraPrice")}
+            value={form.size_extra_price}
+            onChange={(value) => setForm({ ...form, size_extra_price: value })}
+            type="number"
+            placeholder="0"
+          />
+        </div>
+
+
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
