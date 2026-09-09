@@ -94,6 +94,22 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           ) : null}
         </div>
+        <Button
+          type="button"
+          size="sm"
+          disabled={outOfStock}
+          className="mt-2 w-full rounded-full"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (outOfStock) return;
+            addItem(product, 1);
+            toast.success(t("product.added"));
+          }}
+        >
+          <ShoppingCart className="mr-1.5 size-4" />
+          {outOfStock ? t("product.outOfStock") : t("product.addToCart")}
+        </Button>
       </div>
     </div>
   );
