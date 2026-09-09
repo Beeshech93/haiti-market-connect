@@ -1,5 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { Languages, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n";
 import { categoriesQuery } from "@/lib/catalog";
 import { formatHTG } from "@/lib/format";
+import { translateText } from "@/lib/translate.functions";
+
 
 export const Route = createFileRoute("/admin/products")({
   component: AdminProducts,
@@ -51,6 +55,45 @@ function AdminProducts() {
   const categories = useQuery(categoriesQuery());
   const [form, setForm] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
+  const [translating, setTranslating] = useState<"name" | "description" | null>(null);
+  const runTranslate = useServerFn(translateText);
+
+  async function handleTranslate(field: "name" | "description") {
+    const frValue = field === "name" ? form.name_fr : form.description_fr;
+    const htValue = field === "name" ? form.name_ht : form.description_ht;
+
+    let from: "fr" | "ht";
+    let text: string;
+    if (frValue.trim() && !htValue.trim()) {
+      from = "fr";
+      text = frValue.trim();
+    } else if (htValue.trim() && !frValue.trim()) {
+      from = "ht";
+      text = htValue.trim();
+    } else if (frValue.trim() && htValue.trim()) {
+      if (!window.confirm(t("admin.translateOverwrite"))) return;
+      from = "fr";
+      text = frValue.trim();
+    } else {
+      toast.error(t("admin.translateEmpty"));
+      return;
+    }
+
+    const to = from === "fr" ? "ht" : "fr";
+    setTranslating(field);
+    try {
+      const result = await runTranslate({ data: { text, from, to } });
+      const key = `${field}_${to}` as "name_fr" | "name_ht" | "description_fr" | "description_ht";
+      setForm((current) => ({ ...current, [key]: result.text }));
+      toast.success(t("admin.translated"));
+    } catch (error) {
+      console.error(error);
+      toast.error(t("admin.translateError"));
+    } finally {
+      setTranslating(null);
+    }
+  }
+
 
   const products = useQuery({
     queryKey: ["admin-products"],
@@ -229,6 +272,18 @@ function AdminProducts() {
         </div>
 
         <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <Label>{t("admin.nameFr")} / {t("admin.nameHt")}</Label>
+            <TranslateButton
+              busy={translating === "name"}
+              disabled={translating !== null}
+              label={t("admin.translate")}
+              busyLabel={t("admin.translating")}
+              onClick={() => void handleTranslate("name")}
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
           <Label>{t("admin.descFr")}</Label>
           <Textarea
             rows={3}
@@ -237,13 +292,23 @@ function AdminProducts() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label>{t("admin.descHt")}</Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label>{t("admin.descHt")}</Label>
+            <TranslateButton
+              busy={translating === "description"}
+              disabled={translating !== null}
+              label={t("admin.translate")}
+              busyLabel={t("admin.translating")}
+              onClick={() => void handleTranslate("description")}
+            />
+          </div>
           <Textarea
             rows={3}
             value={form.description_ht}
             onChange={(event) => setForm({ ...form, description_ht: event.target.value })}
           />
         </div>
+
         <div className="space-y-1.5">
           <Label>{t("admin.images")}</Label>
           <Textarea
@@ -313,6 +378,39 @@ function AdminProducts() {
     </div>
   );
 }
+
+function TranslateButton({
+  busy,
+  disabled,
+  label,
+  busyLabel,
+  onClick,
+}: {
+  busy: boolean;
+  disabled: boolean;
+  label: string;
+  busyLabel: string;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="shrink-0 rounded-full text-xs"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {busy ? (
+        <Loader2 className="size-3.5 animate-spin" />
+      ) : (
+        <Languages className="size-3.5" />
+      )}
+      {busy ? busyLabel : label}
+    </Button>
+  );
+}
+
 
 function TextField({
   label,

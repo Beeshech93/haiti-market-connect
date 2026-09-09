@@ -182,5 +182,11 @@
   "checkout.natcashUnavailable": "NatCash n'est pas encore disponible pour le paiement. Utilisez MonCash.",
   "checkout.amountTooLarge": "Le montant dépasse la limite MonCash de 75 000 HTG.",
   "admin.sizes": "Tailles (séparées par des virgules)",
-  "admin.sizeExtraPrice": "Prix supplémentaire par taille (HTG)"
+  "admin.sizeExtraPrice": "Prix supplémentaire par taille (HTG)",
+  "admin.translate": "Traduire automatiquement",
+  "admin.translating": "Traduction...",
+  "admin.translated": "Traduction ajoutée",
+  "admin.translateError": "La traduction a échoué. Vous pouvez écrire manuellement.",
+  "admin.translateEmpty": "Écrivez d'abord le texte dans une des deux langues.",
+  "admin.translateOverwrite": "Les deux langues sont remplies. Remplacer le texte en Kreyòl par la traduction du français ?"
 }
