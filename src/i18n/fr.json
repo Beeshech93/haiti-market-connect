@@ -180,5 +180,7 @@
   "admin.featured": "Mettre en avant",
   "admin.customer": "Client",
   "checkout.natcashUnavailable": "NatCash n'est pas encore disponible pour le paiement. Utilisez MonCash.",
-  "checkout.amountTooLarge": "Le montant dépasse la limite MonCash de 75 000 HTG."
+  "checkout.amountTooLarge": "Le montant dépasse la limite MonCash de 75 000 HTG.",
+  "admin.sizes": "Tailles (séparées par des virgules)",
+  "admin.sizeExtraPrice": "Prix supplémentaire par taille (HTG)"
 }

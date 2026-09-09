@@ -30,6 +30,8 @@ const EMPTY = {
   stock: "0",
   category_id: "",
   images: "",
+  sizes: "",
+  size_extra_price: "",
   is_featured: false,
 };
 
@@ -106,6 +108,24 @@ function AdminProducts() {
         .from("product_images")
         .insert(urls.map((url, index) => ({ product_id: product.id, url, sort_order: index })));
     }
+
+    const sizes = form.sizes
+      .split(/[,\n]/)
+      .map((size) => size.trim())
+      .filter(Boolean);
+    if (sizes.length > 0) {
+      const extraPrice = Number(form.size_extra_price || 0);
+      await supabase.from("product_variants").insert(
+        sizes.map((size, index) => ({
+          product_id: product.id,
+          kind: "size",
+          value: size,
+          extra_price: extraPrice,
+          sort_order: index,
+        })),
+      );
+    }
+
 
     setBusy(false);
     setForm(EMPTY);
@@ -232,6 +252,23 @@ function AdminProducts() {
             onChange={(event) => setForm({ ...form, images: event.target.value })}
           />
         </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <TextField
+            label={t("admin.sizes")}
+            value={form.sizes}
+            onChange={(value) => setForm({ ...form, sizes: value })}
+            placeholder="S, M, L, XL"
+          />
+          <TextField
+            label={t("admin.sizeExtraPrice")}
+            value={form.size_extra_price}
+            onChange={(value) => setForm({ ...form, size_extra_price: value })}
+            type="number"
+            placeholder="0"
+          />
+        </div>
+
 
         <label className="flex items-center gap-2 text-sm">
           <input
