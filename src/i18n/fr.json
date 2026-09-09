@@ -188,5 +188,15 @@
   "admin.translated": "Traduction ajoutée",
   "admin.translateError": "La traduction a échoué. Vous pouvez écrire manuellement.",
   "admin.translateEmpty": "Écrivez d'abord le texte dans une des deux langues.",
-  "admin.translateOverwrite": "Les deux langues sont remplies. Remplacer le texte en Kreyòl par la traduction du français ?"
+  "admin.translateOverwrite": "Les deux langues sont remplies. Remplacer le texte en Kreyòl par la traduction du français ?",
+  "admin.finance": "Finance",
+  "admin.grossMargin": "Marge brute",
+  "admin.margin": "Marge",
+  "admin.marginByProduct": "Marge par produit",
+  "admin.marginByOrder": "Marge par commande",
+  "admin.paymentBreakdown": "Paiements par opérateur",
+  "admin.transactions": "transactions",
+  "admin.unitsSold": "Unités vendues",
+  "admin.product": "Produit",
+  "admin.noFinanceData": "Aucune donnée financière pour le moment."
 }
