@@ -67,7 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       session,
       user: session?.user ?? null,
       profile,
-      isAdmin,
+      roles,
+      isAdmin: roles.some((role) => role === "admin" || role === "super_admin"),
+      isFinance: roles.some((role) => role === "finance" || role === "super_admin"),
       loading,
       signOut: async () => {
         await queryClient.cancelQueries();
@@ -75,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await supabase.auth.signOut();
       },
     }),
-    [session, profile, isAdmin, loading, queryClient],
+    [session, profile, roles, loading, queryClient],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
