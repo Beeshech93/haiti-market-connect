@@ -26,6 +26,7 @@ import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
+import { Route as ApiPublicImagesSplatRouteImport } from './routes/api/public/images/$'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as ApiPublicPaymentsBazikWebhookRouteImport } from './routes/api/public/payments/bazik/webhook'
 
@@ -114,6 +115,11 @@ const ProductsSlugRoute = ProductsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ProductsRoute,
 } as any)
+const ApiPublicImagesSplatRoute = ApiPublicImagesSplatRouteImport.update({
+  id: '/api/public/images/$',
+  path: '/api/public/images/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/images/$': typeof ApiPublicImagesSplatRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
 }
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/api/public/images/$': typeof ApiPublicImagesSplatRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
 }
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/images/$': typeof ApiPublicImagesSplatRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
 }
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/products/$slug'
     | '/admin/'
+    | '/api/public/images/$'
     | '/lovable/email/transactional/preview'
     | '/api/public/payments/bazik/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/products/$slug'
     | '/admin'
+    | '/api/public/images/$'
     | '/lovable/email/transactional/preview'
     | '/api/public/payments/bazik/webhook'
   id:
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/products/$slug'
     | '/admin/'
+    | '/api/public/images/$'
     | '/lovable/email/transactional/preview'
     | '/api/public/payments/bazik/webhook'
   fileRoutesById: FileRoutesById
@@ -267,6 +279,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
+  ApiPublicImagesSplatRoute: typeof ApiPublicImagesSplatRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   ApiPublicPaymentsBazikWebhookRoute: typeof ApiPublicPaymentsBazikWebhookRoute
 }
@@ -392,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsSlugRouteImport
       parentRoute: typeof ProductsRoute
     }
+    '/api/public/images/$': {
+      id: '/api/public/images/$'
+      path: '/api/public/images/$'
+      fullPath: '/api/public/images/$'
+      preLoaderRoute: typeof ApiPublicImagesSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -460,6 +480,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
+  ApiPublicImagesSplatRoute: ApiPublicImagesSplatRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   ApiPublicPaymentsBazikWebhookRoute: ApiPublicPaymentsBazikWebhookRoute,
 }
