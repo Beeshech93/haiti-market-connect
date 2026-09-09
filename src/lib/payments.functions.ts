@@ -70,10 +70,15 @@ export const createPayment = createServerFn({ method: "POST" })
           email: order.customer_email,
         },
         returnUrl: `${appUrl()}/payment/success?order=${order.order_number}`,
+        errorUrl: `${appUrl()}/payment/success?order=${order.order_number}&status=error`,
         webhookUrl: `${appUrl()}/api/public/payments/bazik/webhook`,
       });
     } catch (bazikError) {
       console.error("Bazik createPayment failed", bazikError);
+      const message = bazikError instanceof Error ? bazikError.message : "";
+      // Bazik collects customer payments through MonCash only.
+      if (message === BAZIK_PROVIDER_UNSUPPORTED) throw new Error(BAZIK_PROVIDER_UNSUPPORTED);
+      if (message === "BAZIK_AMOUNT_TOO_LARGE") throw new Error("BAZIK_AMOUNT_TOO_LARGE");
       throw new Error("PAYMENT_CREATE_FAILED");
     }
 
