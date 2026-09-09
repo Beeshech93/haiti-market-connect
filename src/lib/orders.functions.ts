@@ -126,6 +126,31 @@ export const createOrder = createServerFn({ method: "POST" })
       created_by: userId,
     });
 
+    // Confirmation email — never blocks the order if sending fails.
+    try {
+      const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+      await sendTemplateEmail("order-confirmation", data.customer.email, {
+        templateData: {
+          customerName: data.customer.full_name,
+          orderNumber: order.order_number,
+          items: lines.map((line) => ({
+            name: line.product_name,
+            quantity: line.quantity,
+            unit_price: line.unit_price,
+          })),
+          subtotal,
+          shippingCost,
+          total,
+          deliveryZone: zone.name_fr,
+          etaDays: zone.eta_days,
+        },
+        idempotencyKey: `order-confirmation-${order.id}`,
+      });
+    } catch (error) {
+      console.error("order confirmation email failed", error);
+    }
+
+
     return {
       order_id: order.id,
       order_number: order.order_number,
