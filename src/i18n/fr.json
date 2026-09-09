@@ -198,5 +198,10 @@
   "admin.transactions": "transactions",
   "admin.unitsSold": "Unités vendues",
   "admin.product": "Produit",
-  "admin.noFinanceData": "Aucune donnée financière pour le moment."
+  "admin.noFinanceData": "Aucune donnée financière pour le moment.",
+  "admin.edit": "Modifier",
+  "admin.editProduct": "Modifier le produit",
+  "admin.update": "Mettre à jour",
+  "admin.updated": "Produit mis à jour",
+  "admin.cancelEdit": "Annuler la modification"
 }
