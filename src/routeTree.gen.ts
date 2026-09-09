@@ -25,6 +25,7 @@ import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as ApiPublicPaymentsBazikWebhookRouteImport } from './routes/api/public/payments/bazik/webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -107,6 +108,12 @@ const ProductsSlugRoute = ProductsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ProductsRoute,
 } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaymentsBazikWebhookRoute =
   ApiPublicPaymentsBazikWebhookRouteImport.update({
     id: '/api/public/payments/bazik/webhook',
@@ -131,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -149,6 +157,7 @@ export interface FileRoutesByTo {
   '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
 }
 export interface FileRoutesById {
@@ -169,6 +178,7 @@ export interface FileRoutesById {
   '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
 }
 export interface FileRouteTypes {
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/products/$slug'
     | '/admin/'
+    | '/lovable/email/transactional/preview'
     | '/api/public/payments/bazik/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/products/$slug'
     | '/admin'
+    | '/lovable/email/transactional/preview'
     | '/api/public/payments/bazik/webhook'
   id:
     | '__root__'
@@ -227,6 +239,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/products/$slug'
     | '/admin/'
+    | '/lovable/email/transactional/preview'
     | '/api/public/payments/bazik/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -242,6 +255,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   ApiPublicPaymentsBazikWebhookRoute: typeof ApiPublicPaymentsBazikWebhookRoute
 }
 
@@ -359,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsSlugRouteImport
       parentRoute: typeof ProductsRoute
     }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/bazik/webhook': {
       id: '/api/public/payments/bazik/webhook'
       path: '/api/public/payments/bazik/webhook'
@@ -418,6 +439,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   ApiPublicPaymentsBazikWebhookRoute: ApiPublicPaymentsBazikWebhookRoute,
 }
 export const routeTree = rootRouteImport
