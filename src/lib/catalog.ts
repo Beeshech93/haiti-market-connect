@@ -18,15 +18,15 @@ export const categoriesQuery = () =>
   });
 
 export type ProductFilters = {
-  search?: string;
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  inStockOnly?: boolean;
-  sort?: "newest" | "priceAsc" | "priceDesc" | "popular";
-  featured?: boolean;
-  promo?: boolean;
-  limit?: number;
+  search?: string | undefined;
+  category?: string | undefined;
+  minPrice?: number | undefined;
+  maxPrice?: number | undefined;
+  inStockOnly?: boolean | undefined;
+  sort?: "newest" | "priceAsc" | "priceDesc" | "popular" | undefined;
+  featured?: boolean | undefined;
+  promo?: boolean | undefined;
+  limit?: number | undefined;
 };
 
 export const productsQuery = (filters: ProductFilters = {}) =>
