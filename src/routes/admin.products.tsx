@@ -144,7 +144,7 @@ function AdminProducts() {
       category_id: data.category_id ?? "",
       images: images.join("\n"),
       sizes: variants.map((variant) => variant.value).join(", "),
-      size_extra_price: variants.length > 0 ? String(variants[0].extra_price ?? 0) : "",
+      size_extra_price: variants[0] ? String(variants[0].extra_price ?? 0) : "",
       is_featured: data.is_featured ?? false,
     });
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
