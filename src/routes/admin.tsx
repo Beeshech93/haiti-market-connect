@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminLayout() {
   const { t } = useI18n();
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, isFinance, loading } = useAuth();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   if (loading) {
@@ -44,11 +44,15 @@ function AdminLayout() {
     );
   }
 
-  const tabs = [
+  const tabs: {
+    to: "/admin" | "/admin/products" | "/admin/orders" | "/admin/finance";
+    label: string;
+  }[] = [
     { to: "/admin", label: t("admin.overview") },
     { to: "/admin/products", label: t("admin.products") },
     { to: "/admin/orders", label: t("admin.orders") },
-  ] as const;
+    ...(isFinance ? [{ to: "/admin/finance" as const, label: t("admin.finance") }] : []),
+  ];
 
   return (
     <ShopLayout>

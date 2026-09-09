@@ -188,5 +188,15 @@
   "admin.translated": "Tradiksyon an ajoute",
   "admin.translateError": "Tradiksyon an pa mache. Ou ka ekri alamen.",
   "admin.translateEmpty": "Ekri tèks la nan youn nan de lang yo anvan.",
-  "admin.translateOverwrite": "De lang yo gen tèks. Ranplase tèks Kreyòl la ak tradiksyon franse a?"
+  "admin.translateOverwrite": "De lang yo gen tèks. Ranplase tèks Kreyòl la ak tradiksyon franse a?",
+  "admin.finance": "Finans",
+  "admin.grossMargin": "Benefis brit",
+  "admin.margin": "Benefis",
+  "admin.marginByProduct": "Benefis pa pwodwi",
+  "admin.marginByOrder": "Benefis pa kòmand",
+  "admin.paymentBreakdown": "Peman pa operatè",
+  "admin.transactions": "tranzaksyon",
+  "admin.unitsSold": "Kantite vann",
+  "admin.product": "Pwodwi",
+  "admin.noFinanceData": "Pa gen done finansye pou kounye a."
 }
