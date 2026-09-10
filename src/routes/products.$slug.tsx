@@ -1,12 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Heart, Minus, Package, Plus, ShieldCheck, Star, Truck } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Minus,
+  Package,
+  Plus,
+  ShieldCheck,
+  Star,
+  Truck,
+  ZoomIn,
+} from "lucide-react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ProductGrid } from "@/components/ProductCard";
 import { ShopLayout } from "@/components/ShopLayout";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { localized, useI18n } from "@/i18n";
 import { useAuth } from "@/lib/auth-context";
@@ -47,6 +59,8 @@ function ProductDetailPage() {
   const product = productQuery.data;
 
   const [activeImage, setActiveImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [options, setOptions] = useState<CartOptions>({});
 
@@ -91,6 +105,15 @@ function ProductDetailPage() {
     );
   }
 
+  const prevImage = useCallback(
+    () => setActiveImage((i) => (i - 1 + images.length) % images.length),
+    [images.length],
+  );
+  const nextImage = useCallback(
+    () => setActiveImage((i) => (i + 1) % images.length),
+    [images.length],
+  );
+
   const price = effectivePrice(product);
   const discount = discountPercent(Number(product.selling_price), product.sale_price);
   const inStock = product.stock > 0;
@@ -107,16 +130,26 @@ function ProductDetailPage() {
           <div className="space-y-3">
             <div className="relative overflow-hidden rounded-3xl border border-border bg-surface">
               {images[activeImage] ? (
-                <img
-                  src={images[activeImage].url}
-                  alt={localized(product, "name", lang)}
-                  className="aspect-square w-full object-cover"
-                />
+                <button
+                  type="button"
+                  onClick={() => setLightboxOpen(true)}
+                  className="group relative block w-full cursor-zoom-in"
+                  aria-label={t("product.zoomImage")}
+                >
+                  <img
+                    src={images[activeImage].url}
+                    alt={localized(product, "name", lang)}
+                    className="aspect-square w-full object-cover"
+                  />
+                  <span className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                    <ZoomIn className="size-4" />
+                  </span>
+                </button>
               ) : (
                 <div className="aspect-square w-full" />
               )}
               {discount ? (
-                <span className="absolute left-3 top-3 rounded-full bg-accent px-2.5 py-1 text-xs font-bold text-accent-foreground">
+                <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-accent px-2.5 py-1 text-xs font-bold text-accent-foreground">
                   -{discount}%
                 </span>
               ) : null}
@@ -330,6 +363,58 @@ function ProductDetailPage() {
           </section>
         ) : null}
       </div>
+
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent
+          className="max-w-none border-none bg-black/95 p-0 text-white sm:max-w-3xl [&>button]:text-white"
+          onTouchStart={(e) => {
+            touchStartX.current = e.touches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(e) => {
+            if (touchStartX.current === null || images.length < 2) return;
+            const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
+            touchStartX.current = null;
+            if (Math.abs(dx) > 40) {
+              if (dx < 0) nextImage();
+              else prevImage();
+            }
+          }}
+        >
+          <DialogTitle className="sr-only">{localized(product, "name", lang)}</DialogTitle>
+          <div className="relative flex items-center justify-center">
+            {images[activeImage] ? (
+              <img
+                src={images[activeImage].url}
+                alt={localized(product, "name", lang)}
+                className="max-h-[85vh] w-full object-contain"
+              />
+            ) : null}
+            {images.length > 1 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={prevImage}
+                  aria-label={t("product.prevImage")}
+                  className="absolute left-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-white hover:bg-white/25"
+                >
+                  <ChevronLeft className="size-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={nextImage}
+                  aria-label={t("product.nextImage")}
+                  className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-white hover:bg-white/25"
+                >
+                  <ChevronRight className="size-5" />
+                </button>
+                <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white">
+                  {activeImage + 1} / {images.length}
+                </span>
+              </>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
     </ShopLayout>
   );
 }
