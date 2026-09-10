@@ -28,7 +28,7 @@ type CatalogSearch = {
   stock?: boolean | undefined;
 };
 
-export const Route = createFileRoute("/products")({
+export const Route = createFileRoute("/products/")({
   validateSearch: (search: Record<string, unknown>): CatalogSearch => ({
     q: typeof search["q"] === "string" && search["q"] ? search["q"] : undefined,
     category: typeof search["category"] === "string" && search["category"] ? search["category"] : undefined,

@@ -16,7 +16,6 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as OrdersRouteImport } from './routes/orders'
-import { Route as ProductsRouteImport } from './routes/products'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -25,6 +24,7 @@ import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
+import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 import { Route as ApiPublicImagesSplatRouteImport } from './routes/api/public/images/$'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -63,11 +63,6 @@ const FavoritesRoute = FavoritesRouteImport.update({
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsRoute = ProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -110,10 +105,15 @@ const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
   path: '/payment/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductsIndexRoute = ProductsIndexRouteImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsSlugRoute = ProductsSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => ProductsRoute,
+  id: '/products/$slug',
+  path: '/products/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicImagesSplatRoute = ApiPublicImagesSplatRouteImport.update({
   id: '/api/public/images/$',
@@ -141,7 +141,6 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/favorites': typeof FavoritesRoute
   '/orders': typeof OrdersRouteWithChildren
-  '/products': typeof ProductsRouteWithChildren
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/finance': typeof AdminFinanceRoute
@@ -151,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/products/': typeof ProductsIndexRoute
   '/api/public/images/$': typeof ApiPublicImagesSplatRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
@@ -162,7 +162,6 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/favorites': typeof FavoritesRoute
   '/orders': typeof OrdersRouteWithChildren
-  '/products': typeof ProductsRouteWithChildren
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/finance': typeof AdminFinanceRoute
@@ -172,6 +171,7 @@ export interface FileRoutesByTo {
   '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/products': typeof ProductsIndexRoute
   '/api/public/images/$': typeof ApiPublicImagesSplatRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
@@ -185,7 +185,6 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/favorites': typeof FavoritesRoute
   '/orders': typeof OrdersRouteWithChildren
-  '/products': typeof ProductsRouteWithChildren
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/finance': typeof AdminFinanceRoute
@@ -195,6 +194,7 @@ export interface FileRoutesById {
   '/payment/success': typeof PaymentSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/products/': typeof ProductsIndexRoute
   '/api/public/images/$': typeof ApiPublicImagesSplatRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/api/public/payments/bazik/webhook': typeof ApiPublicPaymentsBazikWebhookRoute
@@ -209,7 +209,6 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/favorites'
     | '/orders'
-    | '/products'
     | '/profile'
     | '/reset-password'
     | '/admin/finance'
@@ -219,6 +218,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/products/$slug'
     | '/admin/'
+    | '/products/'
     | '/api/public/images/$'
     | '/lovable/email/transactional/preview'
     | '/api/public/payments/bazik/webhook'
@@ -230,7 +230,6 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/favorites'
     | '/orders'
-    | '/products'
     | '/profile'
     | '/reset-password'
     | '/admin/finance'
@@ -240,6 +239,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/products/$slug'
     | '/admin'
+    | '/products'
     | '/api/public/images/$'
     | '/lovable/email/transactional/preview'
     | '/api/public/payments/bazik/webhook'
@@ -252,7 +252,6 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/favorites'
     | '/orders'
-    | '/products'
     | '/profile'
     | '/reset-password'
     | '/admin/finance'
@@ -262,6 +261,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/products/$slug'
     | '/admin/'
+    | '/products/'
     | '/api/public/images/$'
     | '/lovable/email/transactional/preview'
     | '/api/public/payments/bazik/webhook'
@@ -275,10 +275,11 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   FavoritesRoute: typeof FavoritesRoute
   OrdersRoute: typeof OrdersRouteWithChildren
-  ProductsRoute: typeof ProductsRouteWithChildren
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
+  ProductsSlugRoute: typeof ProductsSlugRoute
+  ProductsIndexRoute: typeof ProductsIndexRoute
   ApiPublicImagesSplatRoute: typeof ApiPublicImagesSplatRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   ApiPublicPaymentsBazikWebhookRoute: typeof ApiPublicPaymentsBazikWebhookRoute
@@ -333,13 +334,6 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products': {
-      id: '/products'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -398,12 +392,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/products/': {
+      id: '/products/'
+      path: '/products'
+      fullPath: '/products/'
+      preLoaderRoute: typeof ProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products/$slug': {
       id: '/products/$slug'
-      path: '/$slug'
+      path: '/products/$slug'
       fullPath: '/products/$slug'
       preLoaderRoute: typeof ProductsSlugRouteImport
-      parentRoute: typeof ProductsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/images/$': {
       id: '/api/public/images/$'
@@ -456,18 +457,6 @@ const OrdersRouteChildren: OrdersRouteChildren = {
 const OrdersRouteWithChildren =
   OrdersRoute._addFileChildren(OrdersRouteChildren)
 
-interface ProductsRouteChildren {
-  ProductsSlugRoute: typeof ProductsSlugRoute
-}
-
-const ProductsRouteChildren: ProductsRouteChildren = {
-  ProductsSlugRoute: ProductsSlugRoute,
-}
-
-const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
-  ProductsRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -476,10 +465,11 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   FavoritesRoute: FavoritesRoute,
   OrdersRoute: OrdersRouteWithChildren,
-  ProductsRoute: ProductsRouteWithChildren,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
+  ProductsSlugRoute: ProductsSlugRoute,
+  ProductsIndexRoute: ProductsIndexRoute,
   ApiPublicImagesSplatRoute: ApiPublicImagesSplatRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   ApiPublicPaymentsBazikWebhookRoute: ApiPublicPaymentsBazikWebhookRoute,
