@@ -115,14 +115,6 @@ function ProductDetailPage() {
     );
   }
 
-  const prevImage = useCallback(
-    () => setActiveImage((i) => (i - 1 + images.length) % images.length),
-    [images.length],
-  );
-  const nextImage = useCallback(
-    () => setActiveImage((i) => (i + 1) % images.length),
-    [images.length],
-  );
 
   const price = effectivePrice(product);
   const discount = discountPercent(Number(product.selling_price), product.sale_price);
