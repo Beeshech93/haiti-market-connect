@@ -76,6 +76,16 @@ function ProductDetailPage() {
     enabled: Boolean(product?.categories?.slug),
   });
 
+  const prevImage = useCallback(
+    () => setActiveImage((i) => (i - 1 + images.length) % images.length),
+    [images.length],
+  );
+  const nextImage = useCallback(
+    () => setActiveImage((i) => (i + 1) % images.length),
+    [images.length],
+  );
+
+
   if (productQuery.isLoading) {
     return (
       <ShopLayout>
