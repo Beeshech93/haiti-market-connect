@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   Star,
   Truck,
-  X,
   ZoomIn,
 } from "lucide-react";
 import { useCallback, useMemo, useRef, useState } from "react";
