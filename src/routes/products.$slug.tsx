@@ -60,6 +60,8 @@ function ProductDetailPage() {
   const product = productQuery.data;
 
   const [activeImage, setActiveImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [options, setOptions] = useState<CartOptions>({});
 
@@ -103,6 +105,15 @@ function ProductDetailPage() {
       </ShopLayout>
     );
   }
+
+  const prevImage = useCallback(
+    () => setActiveImage((i) => (i - 1 + images.length) % images.length),
+    [images.length],
+  );
+  const nextImage = useCallback(
+    () => setActiveImage((i) => (i + 1) % images.length),
+    [images.length],
+  );
 
   const price = effectivePrice(product);
   const discount = discountPercent(Number(product.selling_price), product.sale_price);
