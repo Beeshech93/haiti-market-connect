@@ -200,6 +200,7 @@ function AdminProducts() {
       images: images.join("\n"),
       sizes: variants.map((variant) => variant.value).join(", "),
       size_extra_price: variants[0] ? String(variants[0].extra_price ?? 0) : "",
+      colors: colorVariants.map((variant) => variant.value).join(", "),
       is_featured: data.is_featured ?? false,
     });
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
@@ -280,7 +281,7 @@ function AdminProducts() {
         .from("product_variants")
         .delete()
         .eq("product_id", productId!)
-        .eq("kind", "size");
+        .in("kind", ["size", "color"]);
     }
     if (sizes.length > 0) {
       const extraPrice = Number(form.size_extra_price || 0);
@@ -290,6 +291,19 @@ function AdminProducts() {
           kind: "size",
           value: size,
           extra_price: extraPrice,
+          sort_order: index,
+        })),
+      );
+    }
+
+    const colors = parseSizes(form.colors);
+    if (colors.length > 0) {
+      await supabase.from("product_variants").insert(
+        colors.map((color, index) => ({
+          product_id: productId!,
+          kind: "color",
+          value: color,
+          extra_price: 0,
           sort_order: index,
         })),
       );
