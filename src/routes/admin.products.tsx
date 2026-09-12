@@ -425,6 +425,30 @@ function AdminProducts() {
           />
         </div>
 
+        {quickSizes.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {quickSizes.map((size) => {
+              const alreadyAdded = parseSizes(form.sizes).some(
+                (existing) => existing.toLowerCase() === size.toLowerCase(),
+              );
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  disabled={alreadyAdded}
+                  className="rounded-full border border-border bg-muted/60 px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted disabled:opacity-40"
+                  onClick={() =>
+                    setForm((current) => ({ ...current, sizes: addSize(current.sizes, size) }))
+                  }
+                >
+                  <Plus className="mr-1 inline size-3" />
+                  {size}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+
 
         <label className="flex items-center gap-2 text-sm">
           <input
