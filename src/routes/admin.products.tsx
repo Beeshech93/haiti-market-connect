@@ -179,6 +179,9 @@ function AdminProducts() {
     const variants = [...(data.product_variants ?? [])]
       .filter((variant) => variant.kind === "size")
       .sort((a, b) => a.sort_order - b.sort_order);
+    const colorVariants = [...(data.product_variants ?? [])]
+      .filter((variant) => variant.kind === "color")
+      .sort((a, b) => a.sort_order - b.sort_order);
 
     setEditingId(id);
     setForm({
