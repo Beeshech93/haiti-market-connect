@@ -36,6 +36,7 @@ const EMPTY = {
   images: "",
   sizes: "",
   size_extra_price: "",
+  colors: "",
   is_featured: false,
 };
 
@@ -68,6 +69,32 @@ function addSize(value: string, size: string) {
   if (current.some((existing) => existing.toLowerCase() === size.toLowerCase())) return value;
   return [...current, size].join(", ");
 }
+
+const COLOR_SWATCHES: Record<string, string> = {
+  Noir: "#111111",
+  Blanc: "#ffffff",
+  Rouge: "#d32f2f",
+  Bleu: "#1e5aa8",
+  Vert: "#2e7d32",
+  Jaune: "#f2c200",
+  Rose: "#e88ab0",
+  Gris: "#8a8a8a",
+  Marron: "#7b4b2a",
+  Beige: "#d9c7a0",
+  Doré: "#c9a227",
+  Argenté: "#c0c0c0",
+  "Noir naturel": "#1b1b1b",
+  Brun: "#4a2f1b",
+  Châtain: "#6f4a2a",
+  Blond: "#d8b96a",
+  Roux: "#a14a1f",
+  "Gris/Grisonnant": "#9c9c9c",
+  Ombré: "#5c3a21",
+  Bordeaux: "#6e1423",
+};
+
+const QUICK_COLORS_GENERAL = Object.keys(COLOR_SWATCHES).slice(0, 12);
+const QUICK_COLORS_CHEVEUX = Object.keys(COLOR_SWATCHES).slice(12);
 
 
 function AdminProducts() {
