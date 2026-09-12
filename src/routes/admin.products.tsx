@@ -110,6 +110,10 @@ function AdminProducts() {
   const selectedCategorySlug =
     (categories.data ?? []).find((category) => category.id === form.category_id)?.slug ?? "";
   const quickSizes = QUICK_SIZES[selectedCategorySlug] ?? [];
+  const quickColors =
+    selectedCategorySlug === "cheveux"
+      ? [...QUICK_COLORS_GENERAL, ...QUICK_COLORS_CHEVEUX]
+      : QUICK_COLORS_GENERAL;
 
   async function handleTranslate(field: "name" | "description") {
     const frValue = field === "name" ? form.name_fr : form.description_fr;
@@ -496,6 +500,39 @@ function AdminProducts() {
             })}
           </div>
         ) : null}
+
+        <TextField
+          label={t("admin.colors")}
+          value={form.colors}
+          onChange={(value) => setForm({ ...form, colors: value })}
+          placeholder="Noir, Blanc, Rouge"
+        />
+
+        <div className="flex flex-wrap gap-1.5">
+          {quickColors.map((color) => {
+            const alreadyAdded = parseSizes(form.colors).some(
+              (existing) => existing.toLowerCase() === color.toLowerCase(),
+            );
+            return (
+              <button
+                key={color}
+                type="button"
+                disabled={alreadyAdded}
+                className="flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted disabled:opacity-40"
+                onClick={() =>
+                  setForm((current) => ({ ...current, colors: addSize(current.colors, color) }))
+                }
+              >
+                <span
+                  className="inline-block size-3 rounded-full border border-border"
+                  style={{ backgroundColor: COLOR_SWATCHES[color] ?? "#cccccc" }}
+                />
+                {color}
+              </button>
+            );
+          })}
+        </div>
+
 
 
         <label className="flex items-center gap-2 text-sm">
