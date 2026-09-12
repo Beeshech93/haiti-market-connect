@@ -36,6 +36,7 @@ const EMPTY = {
   images: "",
   sizes: "",
   size_extra_price: "",
+  colors: "",
   is_featured: false,
 };
 
@@ -69,6 +70,32 @@ function addSize(value: string, size: string) {
   return [...current, size].join(", ");
 }
 
+const COLOR_SWATCHES: Record<string, string> = {
+  Noir: "#111111",
+  Blanc: "#ffffff",
+  Rouge: "#d32f2f",
+  Bleu: "#1e5aa8",
+  Vert: "#2e7d32",
+  Jaune: "#f2c200",
+  Rose: "#e88ab0",
+  Gris: "#8a8a8a",
+  Marron: "#7b4b2a",
+  Beige: "#d9c7a0",
+  Doré: "#c9a227",
+  Argenté: "#c0c0c0",
+  "Noir naturel": "#1b1b1b",
+  Brun: "#4a2f1b",
+  Châtain: "#6f4a2a",
+  Blond: "#d8b96a",
+  Roux: "#a14a1f",
+  "Gris/Grisonnant": "#9c9c9c",
+  Ombré: "#5c3a21",
+  Bordeaux: "#6e1423",
+};
+
+const QUICK_COLORS_GENERAL = Object.keys(COLOR_SWATCHES).slice(0, 12);
+const QUICK_COLORS_CHEVEUX = Object.keys(COLOR_SWATCHES).slice(12);
+
 
 function AdminProducts() {
   const { t, lang } = useI18n();
@@ -83,6 +110,10 @@ function AdminProducts() {
   const selectedCategorySlug =
     (categories.data ?? []).find((category) => category.id === form.category_id)?.slug ?? "";
   const quickSizes = QUICK_SIZES[selectedCategorySlug] ?? [];
+  const quickColors =
+    selectedCategorySlug === "cheveux"
+      ? [...QUICK_COLORS_GENERAL, ...QUICK_COLORS_CHEVEUX]
+      : QUICK_COLORS_GENERAL;
 
   async function handleTranslate(field: "name" | "description") {
     const frValue = field === "name" ? form.name_fr : form.description_fr;
@@ -152,6 +183,9 @@ function AdminProducts() {
     const variants = [...(data.product_variants ?? [])]
       .filter((variant) => variant.kind === "size")
       .sort((a, b) => a.sort_order - b.sort_order);
+    const colorVariants = [...(data.product_variants ?? [])]
+      .filter((variant) => variant.kind === "color")
+      .sort((a, b) => a.sort_order - b.sort_order);
 
     setEditingId(id);
     setForm({
@@ -170,6 +204,7 @@ function AdminProducts() {
       images: images.join("\n"),
       sizes: variants.map((variant) => variant.value).join(", "),
       size_extra_price: variants[0] ? String(variants[0].extra_price ?? 0) : "",
+      colors: colorVariants.map((variant) => variant.value).join(", "),
       is_featured: data.is_featured ?? false,
     });
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
@@ -250,7 +285,7 @@ function AdminProducts() {
         .from("product_variants")
         .delete()
         .eq("product_id", productId!)
-        .eq("kind", "size");
+        .in("kind", ["size", "color"]);
     }
     if (sizes.length > 0) {
       const extraPrice = Number(form.size_extra_price || 0);
@@ -260,6 +295,19 @@ function AdminProducts() {
           kind: "size",
           value: size,
           extra_price: extraPrice,
+          sort_order: index,
+        })),
+      );
+    }
+
+    const colors = parseSizes(form.colors);
+    if (colors.length > 0) {
+      await supabase.from("product_variants").insert(
+        colors.map((color, index) => ({
+          product_id: productId!,
+          kind: "color",
+          value: color,
+          extra_price: 0,
           sort_order: index,
         })),
       );
@@ -452,6 +500,39 @@ function AdminProducts() {
             })}
           </div>
         ) : null}
+
+        <TextField
+          label={t("admin.colors")}
+          value={form.colors}
+          onChange={(value) => setForm({ ...form, colors: value })}
+          placeholder="Noir, Blanc, Rouge"
+        />
+
+        <div className="flex flex-wrap gap-1.5">
+          {quickColors.map((color) => {
+            const alreadyAdded = parseSizes(form.colors).some(
+              (existing) => existing.toLowerCase() === color.toLowerCase(),
+            );
+            return (
+              <button
+                key={color}
+                type="button"
+                disabled={alreadyAdded}
+                className="flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted disabled:opacity-40"
+                onClick={() =>
+                  setForm((current) => ({ ...current, colors: addSize(current.colors, color) }))
+                }
+              >
+                <span
+                  className="inline-block size-3 rounded-full border border-border"
+                  style={{ backgroundColor: COLOR_SWATCHES[color] ?? "#cccccc" }}
+                />
+                {color}
+              </button>
+            );
+          })}
+        </div>
+
 
 
         <label className="flex items-center gap-2 text-sm">

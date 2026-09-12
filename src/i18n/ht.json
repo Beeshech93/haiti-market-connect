@@ -185,6 +185,7 @@
   "checkout.natcashUnavailable": "NatCash poko disponib pou peman. Sèvi ak MonCash.",
   "checkout.amountTooLarge": "Montan an depase limit MonCash 75 000 HTG.",
   "admin.sizes": "Gwosè (separe ak vigil)",
+  "admin.colors": "Koulè (separe ak vigil)",
   "admin.sizeExtraPrice": "Pri siplemantè pa gwosè (HTG)",
   "admin.translate": "Tradwi otomatikman",
   "admin.translating": "Ap tradwi...",
