@@ -74,14 +74,15 @@ function AdminProducts() {
   const { t, lang } = useI18n();
   const queryClient = useQueryClient();
   const categories = useQuery(categoriesQuery());
-  const selectedCategorySlug =
-    (categories.data ?? []).find((category) => category.id === form.category_id)?.slug ?? "";
-  const quickSizes = QUICK_SIZES[selectedCategorySlug] ?? [];
   const [form, setForm] = useState(EMPTY);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [translating, setTranslating] = useState<"name" | "description" | null>(null);
   const runTranslate = useServerFn(translateText);
+
+  const selectedCategorySlug =
+    (categories.data ?? []).find((category) => category.id === form.category_id)?.slug ?? "";
+  const quickSizes = QUICK_SIZES[selectedCategorySlug] ?? [];
 
   async function handleTranslate(field: "name" | "description") {
     const frValue = field === "name" ? form.name_fr : form.description_fr;
