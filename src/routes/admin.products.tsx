@@ -74,6 +74,9 @@ function AdminProducts() {
   const { t, lang } = useI18n();
   const queryClient = useQueryClient();
   const categories = useQuery(categoriesQuery());
+  const selectedCategorySlug =
+    (categories.data ?? []).find((category) => category.id === form.category_id)?.slug ?? "";
+  const quickSizes = QUICK_SIZES[selectedCategorySlug] ?? [];
   const [form, setForm] = useState(EMPTY);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
