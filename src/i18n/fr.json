@@ -185,6 +185,7 @@
   "checkout.natcashUnavailable": "NatCash n'est pas encore disponible pour le paiement. Utilisez MonCash.",
   "checkout.amountTooLarge": "Le montant dépasse la limite MonCash de 75 000 HTG.",
   "admin.sizes": "Tailles (séparées par des virgules)",
+  "admin.colors": "Couleurs (séparées par des virgules)",
   "admin.sizeExtraPrice": "Prix supplémentaire par taille (HTG)",
   "admin.translate": "Traduire automatiquement",
   "admin.translating": "Traduction...",
