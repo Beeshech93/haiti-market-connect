@@ -1,0 +1,1 @@
+INSERT INTO public.categories (slug, name_fr, name_ht, icon, sort_order) VALUES ('cheveux','Cheveux','Cheve','Scissors',9);

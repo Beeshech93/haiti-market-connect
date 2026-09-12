@@ -49,6 +49,27 @@ function slugify(value: string) {
     .slice(0, 60);
 }
 
+const QUICK_SIZES: Record<string, string[]> = {
+  chaussures: ['8.5"', '9"', '9.5"', '10"', '10.5"', '11"', '11.5"', '12"'],
+  cheveux: ['10"', '12"', '14"', '16"', '18"', '20"', '22"', '24"', '26"', '28"', '30"'],
+  mode: ["XS", "S", "M", "L", "XL", "XXL"],
+  enfants: ["XS", "S", "M", "L", "XL", "XXL"],
+};
+
+function parseSizes(value: string) {
+  return value
+    .split(/[,\n]/)
+    .map((size) => size.trim())
+    .filter(Boolean);
+}
+
+function addSize(value: string, size: string) {
+  const current = parseSizes(value);
+  if (current.some((existing) => existing.toLowerCase() === size.toLowerCase())) return value;
+  return [...current, size].join(", ");
+}
+
+
 function AdminProducts() {
   const { t, lang } = useI18n();
   const queryClient = useQueryClient();
@@ -58,6 +79,10 @@ function AdminProducts() {
   const [busy, setBusy] = useState(false);
   const [translating, setTranslating] = useState<"name" | "description" | null>(null);
   const runTranslate = useServerFn(translateText);
+
+  const selectedCategorySlug =
+    (categories.data ?? []).find((category) => category.id === form.category_id)?.slug ?? "";
+  const quickSizes = QUICK_SIZES[selectedCategorySlug] ?? [];
 
   async function handleTranslate(field: "name" | "description") {
     const frValue = field === "name" ? form.name_fr : form.description_fr;
@@ -403,6 +428,30 @@ function AdminProducts() {
             placeholder="0"
           />
         </div>
+
+        {quickSizes.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {quickSizes.map((size) => {
+              const alreadyAdded = parseSizes(form.sizes).some(
+                (existing) => existing.toLowerCase() === size.toLowerCase(),
+              );
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  disabled={alreadyAdded}
+                  className="rounded-full border border-border bg-muted/60 px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted disabled:opacity-40"
+                  onClick={() =>
+                    setForm((current) => ({ ...current, sizes: addSize(current.sizes, size) }))
+                  }
+                >
+                  <Plus className="mr-1 inline size-3" />
+                  {size}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
 
 
         <label className="flex items-center gap-2 text-sm">
