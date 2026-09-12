@@ -49,6 +49,27 @@ function slugify(value: string) {
     .slice(0, 60);
 }
 
+const QUICK_SIZES: Record<string, string[]> = {
+  chaussures: ['8.5"', '9"', '9.5"', '10"', '10.5"', '11"', '11.5"', '12"'],
+  cheveux: ['10"', '12"', '14"', '16"', '18"', '20"', '22"', '24"', '26"', '28"', '30"'],
+  mode: ["XS", "S", "M", "L", "XL", "XXL"],
+  enfants: ["XS", "S", "M", "L", "XL", "XXL"],
+};
+
+function parseSizes(value: string) {
+  return value
+    .split(/[,\n]/)
+    .map((size) => size.trim())
+    .filter(Boolean);
+}
+
+function addSize(value: string, size: string) {
+  const current = parseSizes(value);
+  if (current.some((existing) => existing.toLowerCase() === size.toLowerCase())) return value;
+  return [...current, size].join(", ");
+}
+
+
 function AdminProducts() {
   const { t, lang } = useI18n();
   const queryClient = useQueryClient();
