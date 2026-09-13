@@ -1,5 +1,5 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
-import { setResponseHeaders } from "@tanstack/react-start/server";
+import { setResponseHeader } from "@tanstack/react-start/server";
 
 import { renderErrorPage } from "./lib/error-page";
 import { applySecurityHeaders, SECURITY_HEADERS_RECORD } from "./lib/security-headers";
@@ -7,7 +7,10 @@ import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
 // Security headers (CSP, nosniff, referrer policy, HSTS…) on every response.
 const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => {
-  setResponseHeaders(SECURITY_HEADERS_RECORD);
+  for (const [name, value] of Object.entries(SECURITY_HEADERS_RECORD)) {
+    setResponseHeader(name as never, value);
+  }
+
   const result = await next();
   if (result instanceof Response) {
     applySecurityHeaders(result.headers);
