@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { BazikService } from "@/lib/bazik.server";
+import { clientKey, rateLimit, tooManyRequests } from "@/lib/rate-limit";
+
 
 const payloadSchema = z.object({
   type: z.string().max(120).optional(),
@@ -31,7 +33,13 @@ export const Route = createFileRoute("/api/public/payments/bazik/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // Flood brake: legitimate Bazik traffic is far below this.
+        const limit = rateLimit(clientKey(request, "bazik-webhook"), 60, 60_000);
+        if (!limit.allowed) return tooManyRequests(limit);
+
         const raw = await request.text();
+        if (raw.length > 64_000) return new Response("Payload too large", { status: 413 });
+
 
         // When a shared secret is configured, the signature must match.
         if (BazikService.webhookSignatureConfigured()) {
