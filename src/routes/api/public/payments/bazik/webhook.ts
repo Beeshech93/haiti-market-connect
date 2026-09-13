@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { BazikService } from "@/lib/bazik.server";
+import { clientKey, rateLimit, tooManyRequests } from "@/lib/rate-limit";
+
 
 const payloadSchema = z.object({
   type: z.string().max(120).optional(),

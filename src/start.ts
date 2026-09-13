@@ -1,7 +1,26 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
+import { setResponseHeaders } from "@tanstack/react-start/server";
 
 import { renderErrorPage } from "./lib/error-page";
+import { applySecurityHeaders, SECURITY_HEADERS_RECORD } from "./lib/security-headers";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+
+// Security headers (CSP, nosniff, referrer policy, HSTS…) on every response.
+const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => {
+  setResponseHeaders(SECURITY_HEADERS_RECORD);
+  const result = await next();
+  if (result instanceof Response) {
+    applySecurityHeaders(result.headers);
+  } else if (
+    result != null &&
+    typeof result === "object" &&
+    "response" in result &&
+    (result as { response?: unknown }).response instanceof Response
+  ) {
+    applySecurityHeaders((result as { response: Response }).response.headers);
+  }
+  return result;
+});
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -11,12 +30,12 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
       throw error;
     }
     console.error(error);
-    return new Response(renderErrorPage(), {
-      status: 500,
-      headers: { "content-type": "text/html; charset=utf-8" },
-    });
+    const headers = new Headers({ "content-type": "text/html; charset=utf-8" });
+    applySecurityHeaders(headers);
+    return new Response(renderErrorPage(), { status: 500, headers });
   }
 });
+
 
 // Start installs this automatically when src/start.ts is absent; defining the
 // file opts out, so re-add it explicitly to keep server functions protected
@@ -27,5 +46,6 @@ const csrfMiddleware = createCsrfMiddleware({
 
 export const startInstance = createStart(() => ({
   functionMiddleware: [attachSupabaseAuth],
-  requestMiddleware: [errorMiddleware, csrfMiddleware],
+  requestMiddleware: [securityHeadersMiddleware, errorMiddleware, csrfMiddleware],
 }));
+
