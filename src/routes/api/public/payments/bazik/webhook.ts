@@ -33,9 +33,10 @@ export const Route = createFileRoute("/api/public/payments/bazik/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Flood brake: legitimate Bazik traffic is far below this.
-        const limit = rateLimit(clientKey(request, "bazik-webhook"), 60, 60_000);
+        // Flood brake only: generous enough for Bazik bursts and retries.
+        const limit = rateLimit(clientKey(request, "bazik-webhook"), 300, 60_000);
         if (!limit.allowed) return tooManyRequests(limit);
+
 
         const raw = await request.text();
         if (raw.length > 64_000) return new Response("Payload too large", { status: 413 });
