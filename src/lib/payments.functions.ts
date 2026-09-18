@@ -24,10 +24,12 @@ function appUrl() {
   return (process.env["APP_PUBLIC_URL"] ?? APP_URL).replace(/\/$/, "");
 }
 
-/** MonCash hands back an http:// redirect; HTTPS avoids mixed-content blocking. */
-function secureUrl(url: string | null): string | null {
-  return url ? url.replace(/^http:\/\//i, "https://") : url;
-}
+/**
+ * The MonCash redirect URL must be used EXACTLY as Bazik returns it.
+ * Rewriting its scheme (http -> https) lands on a different MonCash host
+ * session and the gateway answers "Session expired". A top-level browser
+ * navigation is not subject to mixed-content blocking, so no rewrite is needed.
+ */
 
 
 /**
