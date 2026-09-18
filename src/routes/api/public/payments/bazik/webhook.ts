@@ -33,24 +33,29 @@ export const Route = createFileRoute("/api/public/payments/bazik/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Flood brake: legitimate Bazik traffic is far below this.
-        const limit = rateLimit(clientKey(request, "bazik-webhook"), 60, 60_000);
+        // Flood brake only: generous enough for Bazik bursts and retries.
+        const limit = rateLimit(clientKey(request, "bazik-webhook"), 300, 60_000);
         if (!limit.allowed) return tooManyRequests(limit);
+
 
         const raw = await request.text();
         if (raw.length > 64_000) return new Response("Payload too large", { status: 413 });
 
 
-        // When a shared secret is configured, the signature must match.
-        if (BazikService.webhookSignatureConfigured()) {
-          const signature =
-            request.headers.get("x-bazik-signature") ??
-            request.headers.get("x-signature") ??
-            request.headers.get("x-webhook-signature");
+        // Bazik does not document a signature header. When it sends one it must
+        // match; when it sends none, the notification is treated as an
+        // untrusted trigger and the order is re-read from the Bazik API below
+        // (a missing signature can never mark an order as paid on its own).
+        const signature =
+          request.headers.get("x-bazik-signature") ??
+          request.headers.get("x-signature") ??
+          request.headers.get("x-webhook-signature");
+        if (signature && BazikService.webhookSignatureConfigured()) {
           if (!BazikService.verifyWebhookSignature(raw, signature)) {
             return new Response("Invalid signature", { status: 401 });
           }
         }
+
 
         let body: z.infer<typeof payloadSchema>;
         try {

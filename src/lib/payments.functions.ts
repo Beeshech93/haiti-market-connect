@@ -1,14 +1,34 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { BAZIK_NOT_CONFIGURED, BAZIK_PROVIDER_UNSUPPORTED, BazikService } from "@/lib/bazik.server";
 
-const APP_URL = "https://project--77f99939-b7be-49f7-b3b6-25711475e711.lovable.app";
+const APP_URL = "https://achtela.store";
 
+/**
+ * Canonical public origin for Bazik callbacks.
+ *
+ * It must be the origin that actually serves the app: any other hostname
+ * (e.g. the *.lovable.app alias) answers with a 307 redirect to the custom
+ * domain, and Bazik's webhook POST is dropped instead of being followed.
+ */
 function appUrl() {
+  try {
+    const origin = new URL(getRequest().url).origin;
+    if (origin.startsWith("https://")) return origin;
+  } catch {
+    // Not inside a request context — fall back to the configured URL.
+  }
   return (process.env["APP_PUBLIC_URL"] ?? APP_URL).replace(/\/$/, "");
 }
+
+/** MonCash hands back an http:// redirect; HTTPS avoids mixed-content blocking. */
+function secureUrl(url: string | null): string | null {
+  return url ? url.replace(/^http:\/\//i, "https://") : url;
+}
+
 
 /**
  * Creates a Bazik payment (MonCash or NatCash) for an order.
@@ -92,7 +112,8 @@ export const createPayment = createServerFn({ method: "POST" })
       reference_id: reference,
       idempotency_key: idempotencyKey,
       bazik_payment_id: bazik.id || null,
-      checkout_url: bazik.checkoutUrl,
+      checkout_url: secureUrl(bazik.checkoutUrl),
+
     };
 
     const { data: payment, error: paymentError } = existing
