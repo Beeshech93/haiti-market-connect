@@ -114,7 +114,7 @@ export const createPayment = createServerFn({ method: "POST" })
       reference_id: reference,
       idempotency_key: idempotencyKey,
       bazik_payment_id: bazik.id || null,
-      checkout_url: secureUrl(bazik.checkoutUrl),
+      checkout_url: bazik.checkoutUrl,
 
     };
 
