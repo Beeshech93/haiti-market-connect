@@ -215,5 +215,14 @@
   "admin.moveUp": "Monte",
   "admin.moveDown": "Desann",
   "admin.noImages": "Pa gen foto pou kounye a.",
-  "admin.imageUrl": "Oswa kole yon lyen imaj"
+  "admin.imageUrl": "Oswa kole yon lyen imaj",
+  "admin.viewDetails": "Wè detay yo",
+  "admin.hideDetails": "Kache detay yo",
+  "admin.deliveryAddress": "Adrès livrezon",
+  "admin.deliveryMethod": "Metòd livrezon",
+  "admin.amounts": "Montan yo",
+  "admin.discount": "Rabè",
+  "admin.notes": "Nòt",
+  "admin.noItems": "Pa gen atik",
+  "admin.noPayments": "Pa gen peman anrejistre"
 }

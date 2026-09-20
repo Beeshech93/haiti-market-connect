@@ -215,5 +215,14 @@
   "admin.moveUp": "Déplacer vers le haut",
   "admin.moveDown": "Déplacer vers le bas",
   "admin.noImages": "Aucune photo pour le moment.",
-  "admin.imageUrl": "Ou coller un lien d'image"
+  "admin.imageUrl": "Ou coller un lien d'image",
+  "admin.viewDetails": "Voir les détails",
+  "admin.hideDetails": "Masquer les détails",
+  "admin.deliveryAddress": "Adresse de livraison",
+  "admin.deliveryMethod": "Méthode de livraison",
+  "admin.amounts": "Montants",
+  "admin.discount": "Remise",
+  "admin.notes": "Notes",
+  "admin.noItems": "Aucun article",
+  "admin.noPayments": "Aucun paiement enregistré"
 }
