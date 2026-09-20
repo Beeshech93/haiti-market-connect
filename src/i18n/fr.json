@@ -224,5 +224,7 @@
   "admin.discount": "Remise",
   "admin.notes": "Notes",
   "admin.noItems": "Aucun article",
-  "admin.noPayments": "Aucun paiement enregistré"
+  "admin.noPayments": "Aucun paiement enregistré",
+  "footer.privacy": "Politique de confidentialité",
+  "footer.terms": "Conditions générales"
 }

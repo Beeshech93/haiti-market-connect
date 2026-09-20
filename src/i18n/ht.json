@@ -224,5 +224,7 @@
   "admin.discount": "Rabè",
   "admin.notes": "Nòt",
   "admin.noItems": "Pa gen atik",
-  "admin.noPayments": "Pa gen peman anrejistre"
+  "admin.noPayments": "Pa gen peman anrejistre",
+  "footer.privacy": "Politik konfidansyalite",
+  "footer.terms": "Kondisyon jeneral"
 }

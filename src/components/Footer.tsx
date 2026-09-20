@@ -47,6 +47,12 @@ export function Footer() {
           <Link to="/profile" className="block text-muted-foreground hover:text-primary">
             {t("nav.profile")}
           </Link>
+          <Link to="/privacy" className="block text-muted-foreground hover:text-primary">
+            {t("footer.privacy")}
+          </Link>
+          <Link to="/terms" className="block text-muted-foreground hover:text-primary">
+            {t("footer.terms")}
+          </Link>
         </div>
 
         <ul className="space-y-2 text-sm">
