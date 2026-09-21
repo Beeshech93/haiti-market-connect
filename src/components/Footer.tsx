@@ -53,6 +53,9 @@ export function Footer() {
           <Link to="/terms" className="block text-muted-foreground hover:text-primary">
             {t("footer.terms")}
           </Link>
+          <Link to="/install" className="block text-muted-foreground hover:text-primary">
+            {t("footer.install")}
+          </Link>
         </div>
 
         <ul className="space-y-2 text-sm">

@@ -26,7 +26,6 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,woff2,png,svg,webmanifest}"],
         // HTML navigations must never be served cache-first.
-        navigateFallback: undefined,
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,

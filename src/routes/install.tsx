@@ -78,8 +78,8 @@ const content = {
 };
 
 function InstallPage() {
-  const { locale } = useI18n();
-  const copy = content[locale === "ht" ? "ht" : "fr"];
+  const { lang } = useI18n();
+  const copy = content[lang === "ht" ? "ht" : "fr"];
   const [promptEvent, setPromptEvent] = useState<InstallPromptEvent | null>(null);
   const [done, setDone] = useState(false);
 
