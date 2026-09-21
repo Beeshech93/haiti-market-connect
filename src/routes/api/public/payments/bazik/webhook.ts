@@ -173,6 +173,45 @@ export const Route = createFileRoute("/api/public/payments/bazik/webhook")({
 
           // Empty the customer cart once the order is paid.
           await supabaseAdmin.from("cart_items").delete().eq("user_id", payment.user_id);
+
+          // Payment confirmation email — never blocks or fails the webhook.
+          try {
+            const { data: order } = await supabaseAdmin
+              .from("orders")
+              .select(
+                "id, order_number, customer_email, customer_name, subtotal, shipping_cost, total",
+              )
+              .eq("id", payment.order_id)
+              .maybeSingle();
+
+            if (order?.customer_email) {
+              const { data: items } = await supabaseAdmin
+                .from("order_items")
+                .select("product_name, quantity, unit_price")
+                .eq("order_id", order.id);
+
+              const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+              await sendTemplateEmail("payment-confirmed", order.customer_email, {
+                templateData: {
+                  customerName: order.customer_name,
+                  orderNumber: order.order_number,
+                  items: (items ?? []).map((item) => ({
+                    name: item.product_name,
+                    quantity: item.quantity,
+                    unit_price: Number(item.unit_price),
+                  })),
+                  subtotal: Number(order.subtotal),
+                  shippingCost: Number(order.shipping_cost),
+                  total: Number(order.total),
+                  amountPaid: Number(payment.amount),
+                  provider: payment.provider,
+                },
+                idempotencyKey: `payment-confirmed-${order.id}`,
+              });
+            }
+          } catch (emailError) {
+            console.error("payment confirmation email failed", emailError);
+          }
         } else if (status === "FAILED" || status === "CANCELLED") {
           await supabaseAdmin
             .from("orders")
