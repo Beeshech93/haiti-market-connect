@@ -226,5 +226,9 @@
   "admin.noItems": "Aucun article",
   "admin.noPayments": "Aucun paiement enregistré",
   "footer.privacy": "Politique de confidentialité",
-  "footer.terms": "Conditions générales"
+  "footer.terms": "Conditions générales",
+  "footer.install": "Installer l'app",
+  "install.bannerTitle": "Installez l'app Achte La",
+  "install.bannerCta": "Voir comment installer",
+  "install.bannerClose": "Fermer"
 }

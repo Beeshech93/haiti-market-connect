@@ -226,5 +226,9 @@
   "admin.noItems": "Pa gen atik",
   "admin.noPayments": "Pa gen peman anrejistre",
   "footer.privacy": "Politik konfidansyalite",
-  "footer.terms": "Kondisyon jeneral"
+  "footer.terms": "Kondisyon jeneral",
+  "footer.install": "Enstale app la",
+  "install.bannerTitle": "Enstale app Achte La",
+  "install.bannerCta": "Gade kijan pou enstale",
+  "install.bannerClose": "Fèmen"
 }
