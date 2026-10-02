@@ -25,17 +25,42 @@ import { categoriesQuery, productsQuery } from "@/lib/catalog";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Achte La — Boutique en ligne livrée en Haïti" },
+      { title: "Achte La — Achat en ligne en Haïti, prix en Gourdes" },
       {
         name: "description",
         content:
-          "Découvrez les meilleurs produits livrés directement en Haïti. Mode, chaussures, beauté, électronique. Paiement MonCash et NatCash.",
+          "Achetez en ligne en Haïti : mode, chaussures, cheveux, beauté, électronique. Prix en gourdes (HTG), livraison à Cap-Haïtien et Fort-Liberté, paiement MonCash.",
       },
-      { property: "og:title", content: "Achte La — Boutique en ligne livrée en Haïti" },
+      { property: "og:title", content: "Achte La — Achat en ligne en Haïti" },
       {
         property: "og:description",
         content:
-          "Tout sa ou bezwen nan yon sèl app. Livrezon ann Ayiti, peman MonCash ak NatCash.",
+          "Achte sou entènèt ann Ayiti : pri an goud, livrezon nan Nò ak Nòdès, peman MonCash.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: SITE_URL },
+    ],
+    links: seoLinks("/"),
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": ["Organization", "OnlineStore"],
+          name: "Achte La",
+          url: SITE_URL,
+          logo: `${SITE_URL}/icons/icon-512.png`,
+          email: "support@achtela.store",
+          currenciesAccepted: "HTG",
+          paymentAccepted: "MonCash",
+          address: { "@type": "PostalAddress", addressCountry: "HT" },
+          areaServed: [
+            { "@type": "Country", name: "Haïti" },
+            { "@type": "AdministrativeArea", name: "Nord, Haïti" },
+            { "@type": "AdministrativeArea", name: "Nord-Est, Haïti" },
+          ],
+          knowsLanguage: ["fr-HT", "ht-HT"],
+        }),
       },
     ],
   }),

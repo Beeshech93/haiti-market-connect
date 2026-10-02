@@ -48,18 +48,20 @@ export const Route = createFileRoute("/products/")({
   }),
   head: () => ({
     meta: [
-      { title: "Produits — Achte La" },
+      { title: "Catalogue — Achat en ligne en Haïti | Achte La" },
       {
         name: "description",
         content:
-          "Parcourez le catalogue Achte La : mode, chaussures, beauté, accessoires, maison, électronique. Livraison en Haïti.",
+          "Catalogue Achte La en Haïti : mode, chaussures, cheveux, beauté, maison, électronique. Prix en gourdes, livraison en Haïti, paiement MonCash.",
       },
-      { property: "og:title", content: "Produits — Achte La" },
+      { property: "og:title", content: "Catalogue — Achat en ligne en Haïti | Achte La" },
       {
         property: "og:description",
-        content: "Katalòg Achte La : mòd, soulye, bote, elektwonik. Livrezon ann Ayiti.",
+        content: "Katalòg Achte La ann Ayiti : mòd, soulye, cheve, bote, elektwonik. Pri an goud.",
       },
+      { property: "og:url", content: `${SITE_URL}/products` },
     ],
+    links: seoLinks("/products"),
   }),
   component: CatalogPage,
 });
