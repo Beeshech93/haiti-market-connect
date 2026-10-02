@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { localized, useI18n } from "@/i18n";
 import { categoriesQuery, productsQuery } from "@/lib/catalog";
+import { SITE_URL, seoLinks } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({

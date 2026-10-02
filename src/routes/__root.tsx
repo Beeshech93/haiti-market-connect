@@ -91,6 +91,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Boutique en ligne pour Haïti : mode, électronique, beauté et maison, livrés en Haïti et payés avec MonCash ou NatCash.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Achte La" },
+      { property: "og:locale", content: "fr_HT" },
+      { property: "og:locale:alternate", content: "ht_HT" },
+      { name: "geo.region", content: "HT" },
+      { name: "geo.placename", content: "Haïti" },
+      { name: "geo.position", content: "18.9712;-72.2852" },
+      { name: "ICBM", content: "18.9712, -72.2852" },
+      { httpEquiv: "content-language", content: "fr-HT, ht-HT" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#0B3D91" },
       { name: "mobile-web-app-capable", content: "yes" },
@@ -119,7 +127,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="fr-HT">
       <head>
         <HeadContent />
       </head>

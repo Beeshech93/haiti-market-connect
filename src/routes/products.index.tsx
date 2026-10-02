@@ -17,6 +17,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { localized, useI18n } from "@/i18n";
 import { categoriesQuery, productsQuery, type ProductFilters } from "@/lib/catalog";
+import { SITE_URL, seoLinks } from "@/lib/seo";
 
 type CatalogSearch = {
   q?: string | undefined;
