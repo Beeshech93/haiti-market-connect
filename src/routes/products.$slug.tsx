@@ -23,27 +23,86 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { localized, useI18n } from "@/i18n";
 import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
-import { productBySlugQuery, productsQuery } from "@/lib/catalog";
+import { productBySlugQuery, productImage, productsQuery } from "@/lib/catalog";
+import { SITE_URL, absoluteUrl, seoLinks } from "@/lib/seo";
 import { useFavorites } from "@/lib/favorites";
 import { discountPercent, effectivePrice, formatHTG } from "@/lib/format";
 import type { CartOptions } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/products/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Produit ${params.slug} — Achte La` },
-      {
-        name: "description",
-        content: "Fiche produit Achte La : prix en gourdes, livraison en Haïti, paiement MonCash ou NatCash.",
-      },
-      { property: "og:title", content: `Produit — Achte La` },
-      {
-        property: "og:description",
-        content: "Pwodwi Achte La : pri an goud, livrezon ann Ayiti, peman MonCash oswa NatCash.",
-      },
-    ],
-  }),
+  loader: async ({ context, params }) => {
+    try {
+      const product = await context.queryClient.ensureQueryData(productBySlugQuery(params.slug));
+      return { product };
+    } catch {
+      return { product: null };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const url = `${SITE_URL}/products/${params.slug}`;
+    const product = loaderData?.product;
+    if (!product) {
+      return {
+        meta: [
+          { title: "Produit — Achte La" },
+          { name: "description", content: "Produit Achte La, livré en Haïti." },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+    const name = product.name_fr;
+    const price = effectivePrice(product);
+    const priceText = formatHTG(price);
+    const image = absoluteUrl(productImage(product));
+    const desc = `${name} à ${priceText} — livraison en Haïti, paiement MonCash. Achte La.`;
+    const descHt = `${product.name_ht || name} pou ${priceText} — livrezon ann Ayiti, peman MonCash.`;
+    const title = `${name} — Achte La`;
+    const imageMeta = image
+      ? [
+          { property: "og:image", content: image },
+          { name: "twitter:image", content: image },
+        ]
+      : [];
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: descHt },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: url },
+        { property: "product:price:amount", content: String(price) },
+        { property: "product:price:currency", content: "HTG" },
+        ...imageMeta,
+      ],
+      links: seoLinks(`/products/${params.slug}`),
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name,
+            image: image ? [image] : undefined,
+            description: (product.description_fr || desc).slice(0, 5000),
+            sku: product.sku ?? undefined,
+            url,
+            offers: {
+              "@type": "Offer",
+              url,
+              price: String(price),
+              priceCurrency: "HTG",
+              availability:
+                product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+              areaServed: { "@type": "Country", name: "Haïti" },
+              seller: { "@type": "Organization", name: "Achte La" },
+            },
+          }),
+        },
+      ],
+    };
+  },
   component: ProductDetailPage,
 });
 

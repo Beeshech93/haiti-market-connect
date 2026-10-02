@@ -34,11 +34,14 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     if (stored === "fr" || stored === "ht") setLangState(stored);
   }, []);
 
+  useEffect(() => {
+    document.documentElement.lang = lang === "ht" ? "ht-HT" : "fr-HT";
+  }, [lang]);
+
   const setLang = useCallback((next: Lang) => {
     setLangState(next);
     window.localStorage.setItem(STORAGE_KEY, next);
-    document.documentElement.lang = next === "ht" ? "ht" : "fr";
-  }, []);
+      }, []);
 
   const t = useCallback(
     (key: string, vars?: Record<string, string | number>) => {
